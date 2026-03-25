@@ -8,14 +8,14 @@
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; background: #000; color: #fff; font-family: 'Arial', sans-serif; overflow: hidden; }
 
-        /* LOGIN ESTILO VERSÃO 1 (LIMPO) */
+        /* LOGIN TOTALMENTE LIMPO */
         #telaLogin { 
             position: fixed; inset: 0; background: #000; z-index: 9999; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
         }
         .logo-v1 { color: #ff0000; font-size: 38px; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px; text-shadow: 0 0 15px #ff0000; }
-        .input-v1 { background: #111; border: 1px solid #ff0000; padding: 15px; color: #fff; width: 260px; border-radius: 5px; margin-bottom: 20px; text-align: center; font-size: 16px; }
-        .btn-entrar-v1 { width: 260px; height: 60px; background: #ff0000; color: #fff; border: none; font-size: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .input-v1 { background: #111; border: 1px solid #ff0000; padding: 15px; color: #fff; width: 260px; border-radius: 5px; margin-bottom: 25px; text-align: center; font-size: 16px; }
+        .btn-entrar-v1 { width: 260px; height: 60px; background: #ff0000; color: #fff; border: none; font-size: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 5px; }
 
         /* HEADER */
         .header { 
@@ -51,8 +51,8 @@
 
 <div id="telaLogin">
     <div class="logo-v1">DEATH STORE</div>
-    <input type="text" id="keyField" class="input-v1" placeholder="KEY DE ACESSO">
-    <button class="btn-entrar-v1" onclick="entrar()">ENTRAR</button>
+    <input type="text" id="keyField" class="input-v1" placeholder="DIGITE SUA KEY">
+    <button class="btn-entrar-v1" onclick="entrar()">ACESSAR PAINEL</button>
 </div>
 
 <div class="header" id="headerUI">
@@ -80,7 +80,7 @@
     let rodando = false;
     let saques = 0;
     let timer = null;
-    // AS KEYS ESTÃO AQUI NO CÓDIGO, MAS NÃO APARECEM MAIS NA TELA
+    // Chaves permanecem ocultas no código
     const chaves = ["KEY1", "KEY2", "KEY3", "KEY4", "KEY5"];
 
     function entrar() {
@@ -89,7 +89,9 @@
             document.getElementById('telaLogin').style.display = 'none';
             document.getElementById('gameUI').style.display = 'flex';
             document.getElementById('headerUI').style.display = 'flex';
-        } else { alert("KEY INVÁLIDA!"); }
+        } else { 
+            alert("ACESSO NEGADO: KEY INVÁLIDA!"); 
+        }
     }
 
     function start() {
@@ -101,7 +103,7 @@
             document.getElementById('btnSacar').style.visibility = 'visible';
             
             timer = setInterval(() => {
-                multX += 0.05 + (Math.random() * 0.1);
+                multX += 0.04 + (Math.random() * 0.1);
                 if(multX >= 10.00) { multX = 10.00; clearInterval(timer); }
                 document.getElementById('contador').innerText = multX.toFixed(2) + "x";
             }, 80);
@@ -114,13 +116,13 @@
         rodando = false;
         saques++;
 
-        // Transforma o multiplicador (1.00x - 10.00x) em valor real (1.00M - 1.99M)
-        let decimais = Math.floor((multX - 1) * 11); 
-        if(decimais > 99) decimais = 99;
-        let finalM = "1." + (decimais < 10 ? "0" + decimais : decimais) + "M";
+        // Multiplicador 1-10x vira Valor 1.00-1.99M
+        let d = Math.floor((multX - 1) * 11); 
+        if(d > 99) d = 99;
+        let finalVal = "1." + (d < 10 ? "0" + d : d) + "M";
 
-        document.getElementById('saldoTxt').innerText = "SALDO: " + finalM;
-        document.getElementById('vFinal').innerText = finalM;
+        document.getElementById('saldoTxt').innerText = "SALDO: " + finalVal;
+        document.getElementById('vFinal').innerText = finalVal;
         document.getElementById('telaPrint').style.display = 'flex';
         document.getElementById('btnSacar').style.visibility = 'hidden';
     }
