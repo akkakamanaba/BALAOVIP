@@ -56,7 +56,21 @@ body {
 
 .sacar-topo:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 40px red;
+}
+
+/* HISTÓRICO */
+#historico {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.historico-num {
+  margin: 5px;
+  display: inline-block;
+  font-size: 18px;
+  color: #ff4d4d;
+  text-shadow: 0 0 10px red;
 }
 
 /* BARRA */
@@ -96,32 +110,6 @@ body {
   text-align: center;
 }
 
-.login-box input {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  margin-top: 15px;
-  width: 220px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.login-box button {
-  margin-top: 15px;
-  padding: 12px 25px;
-  border-radius: 10px;
-  border: none;
-  background: red;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 0 15px red;
-}
-
-.login-box button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 30px red;
-}
-
 /* GAME */
 .game-area {
   width: 380px;
@@ -148,7 +136,6 @@ body {
   font-size:14px;
   font-weight:bold;
   background: radial-gradient(circle at 30% 30%, #ff1a1a, #660000);
-  box-shadow: 0 0 30px red;
 }
 
 #multiFloat {
@@ -160,18 +147,7 @@ body {
   font-weight: bold;
 }
 
-/* BOTÃO INICIAR */
-.segurar {
-  margin-top: 20px;
-  background: red;
-  padding: 14px 30px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-/* RESULTADO SAQUE */
+/* RESULTADO */
 #resultadoTela {
   position: fixed;
   width: 100%;
@@ -182,38 +158,9 @@ body {
   align-items: center;
   flex-direction: column;
 }
-
-#resultadoTela .box h1 {
-  font-size: 36px;
-  margin: 10px 0;
-}
-
-#resultadoTela .box p {
-  font-size: 16px;
-  margin: 5px 0;
-}
-
-/* CONFETE */
-.confete {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: red;
-  opacity: 0.8;
-  top: -10px;
-  border-radius: 50%;
-  animation: cair 2s linear forwards;
-}
-
-@keyframes cair {
-  to { transform: translateY(500px) rotate(360deg); opacity:0; }
-}
 </style>
 </head>
 <body>
-
-<audio id="somExplosao" src="https://www.myinstants.com/media/sounds/explosion.mp3"></audio>
-<audio id="somConfete" src="https://www.myinstants.com/media/sounds/cheering-crowd.mp3"></audio>
 
 <!-- LOGIN -->
 <div class="login" id="login">
@@ -231,6 +178,9 @@ body {
     <div class="saldo-box">💎 <span id="saldo">1.0M</span></div>
     <div class="sacar-topo" id="btnSacar">SACAR</div>
   </div>
+
+  <div id="historico"></div>
+
   <div class="bar-container">
     <div class="bar-fill" id="barFill"></div>
   </div>
@@ -251,83 +201,87 @@ body {
     <h2>💰 SAQUE ÚNICO</h2>
     <h1 id="valor"></h1>
     <p id="codigo"></p>
-    <p>🎉 Parabéns, saque realizado com sucesso!</p>
-    <p>📸 Tire print e envie para verificação</p>
+    <p id="dataHora"></p>
+
+    <button onclick="copiarCodigo()">COPIAR CÓDIGO</button>
+    <p>📸 Tire print e envie</p>
   </div>
 </div>
 
 <script>
-let saldo = 1_000_000;
 let multi = 1;
 let intervalo = null;
 let jogando = false;
-let usado = false;
-
-// KEYS
-const keys = {
-  "KEY1":true,"KEY2":true,"KEY3":true,"KEY4":true,"KEY5":true,
-  "KEY6":true,"KEY7":true,"KEY8":true,"KEY9":true,"KEY10":true,
-  "KEY11":true,"KEY12":true,"KEY13":true,"KEY14":true,"KEY15":true
-};
+let historico = [];
 
 const balao = document.getElementById("balao");
 const multiFloat = document.getElementById("multiFloat");
 const btnSegurar = document.getElementById("btnSegurar");
 const btnSacar = document.getElementById("btnSacar");
 const barFill = document.getElementById("barFill");
-const gameArea = document.querySelector('.game-area');
-
-function atualizar(){ document.getElementById("saldo").innerText = (saldo/1_000_000).toFixed(2) + "M"; }
 
 // LOGIN
 document.getElementById("btnEntrar").onclick = () => {
-  let key = document.getElementById("keyInput").value.trim();
-  if(keys[key]){
-    keys[key] = false;
-    document.getElementById("login").style.display="none";
-    document.getElementById("game").style.display="flex";
-    document.getElementById("topo").style.display="flex";
-    atualizar();
-  } else { alert("Key inválida ou já usada"); }
+  document.getElementById("login").style.display="none";
+  document.getElementById("game").style.display="flex";
+  document.getElementById("topo").style.display="flex";
 };
 
-// INICIAR BALÃO
+// HISTÓRICO
+function adicionarHistorico(valor){
+  historico.unshift(valor);
+  if(historico.length > 12) historico.pop();
+
+  let html = "";
+  historico.forEach(v => {
+    html += `<span class="historico-num">${v.toFixed(2)}x</span>`;
+  });
+
+  document.getElementById("historico").innerHTML = html;
+}
+
+// JOGO
 btnSegurar.onclick = () => {
-  if(jogando || usado) return;
-  usado = true;
+  if(jogando) return;
+
   jogando = true;
   multi = 1;
-  let tempo = 0;
-  const maxMulti = 1.8;
 
   intervalo = setInterval(()=>{
-    tempo += 50;
-    multi = 1 + 0.8 * Math.pow(tempo/30000,2);
-    if(multi > maxMulti) multi = maxMulti;
+    multi += 0.02;
     multiFloat.innerText = multi.toFixed(2)+"x";
-    barFill.style.width = (multi/maxMulti*100)+"%";
-    document.getElementById("saldo").innerText = (Math.floor(1_000_000*multi)/1_000_000).toFixed(2)+"M";
+    barFill.style.width = (multi*20)+"%";
 
-    let altura = parseInt(balao.style.bottom)||0;
-    altura += 4;
-    balao.style.bottom = altura+"px";
-
-    if(multi>=maxMulti || Math.random()<0.01+(tempo/30000*0.08)){
+    if(Math.random() < 0.03){
       clearInterval(intervalo);
-      jogando=false;
-      multiFloat.innerText="💥 PAROU";
+      jogando = false;
+      multiFloat.innerText = "💥";
+
+      adicionarHistorico(multi);
     }
-  },50);
+  },100);
 };
 
 // SACAR
 btnSacar.onclick = () => {
-  let valorM = (Math.floor(1_000_000*multi)/1_000_000).toFixed(2)+"M";
-  let codigo = "DS-"+Math.floor(Math.random()*999999);
-  document.getElementById("valor").innerText = "💎 "+valorM;
-  document.getElementById("codigo").innerText = "Código: "+codigo;
+  let valor = multi.toFixed(2)+"M";
+  let codigo = "DS-" + Date.now() + "-" + Math.floor(Math.random()*9999);
+  let data = new Date().toLocaleString();
+
+  document.getElementById("valor").innerText = valor;
+  document.getElementById("codigo").innerText = "Código: " + codigo;
+  document.getElementById("dataHora").innerText = data;
+
   document.getElementById("resultadoTela").style.display="flex";
+};
+
+// COPIAR
+function copiarCodigo(){
+  let texto = document.getElementById("codigo").innerText;
+  navigator.clipboard.writeText(texto);
+  alert("Copiado!");
 }
 </script>
+
 </body>
 </html>
