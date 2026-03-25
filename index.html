@@ -1,51 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Death Store Pro - Extreme</title>
-    <style>
-        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; background: #000; color: #fff; font-family: 'Arial', sans-serif; overflow: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Death Store Pro - Extreme</title>
+<style>
+* { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
+body { margin: 0; background: #000; color: #fff; font-family: 'Arial', sans-serif; overflow: hidden; }
 
-        /* LOGIN */
-        #telaLogin { 
-            position: fixed; inset: 0; background: #000; z-index: 9999; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-        }
-        .logo-v1 { color: #ff0000; font-size: 38px; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px; text-shadow: 0 0 15px #ff0000; }
-        .input-v1 { background: #111; border: 1px solid #ff0000; padding: 15px; color: #fff; width: 260px; border-radius: 5px; margin-bottom: 25px; text-align: center; font-size: 16px; }
-        .btn-entrar-v1 { width: 260px; height: 60px; background: #ff0000; color: #fff; border: none; font-size: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 5px; }
+/* LOGIN */
+#telaLogin { 
+    position: fixed; inset: 0; background: #000; z-index: 9999; 
+    display: flex; flex-direction: column; justify-content: center; align-items: center; 
+}
+.logo-v1 { color: #ff0000; font-size: 38px; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px; text-shadow: 0 0 15px #ff0000; }
+.input-v1 { background: #111; border: 1px solid #ff0000; padding: 15px; color: #fff; width: 260px; border-radius: 5px; margin-bottom: 25px; text-align: center; font-size: 16px; }
+.btn-entrar-v1 { width: 260px; height: 60px; background: #ff0000; color: #fff; border: none; font-size: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 5px; }
 
-        /* HEADER */
-        .header { 
-            display: none; justify-content: space-between; align-items: center; 
-            padding: 20px; position: fixed; top: 0; width: 100%; z-index: 100;
-        }
-        #btnSacar { 
-            background: #00ffcc; color: #000; padding: 12px 25px; border-radius: 8px; 
-            font-weight: 900; border: none; cursor: pointer; visibility: hidden;
-            box-shadow: 0 0 15px #00ffcc; 
-        }
-        .saldo-box { border: 1px solid #00ffcc; padding: 10px 20px; border-radius: 8px; color: #00ffcc; font-weight: bold; }
+/* HEADER */
+.header { 
+    display: none; justify-content: space-between; align-items: center; 
+    padding: 20px; position: fixed; top: 0; width: 100%; z-index: 100;
+}
+#btnSacar { 
+    background: #00ffcc; color: #000; padding: 12px 25px; border-radius: 8px; 
+    font-weight: 900; border: none; cursor: pointer; visibility: hidden;
+    box-shadow: 0 0 15px #00ffcc; 
+}
+.saldo-box { border: 1px solid #00ffcc; padding: 10px 20px; border-radius: 8px; color: #00ffcc; font-weight: bold; }
 
-        /* JOGO */
-        .container { height: 100vh; display: none; flex-direction: column; justify-content: center; align-items: center; }
-        #contador { font-size: 90px; font-weight: 900; text-shadow: 0 0 20px #ff0000; font-family: monospace; }
-        .btn-play { width: 220px; height: 60px; background: #ff0000; border: none; color: #fff; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 40px; }
+/* JOGO */
+.container { height: 100vh; display: none; flex-direction: column; justify-content: center; align-items: center; }
+#contador { font-size: 90px; font-weight: 900; text-shadow: 0 0 20px #ff0000; font-family: monospace; }
+.btn-play { width: 220px; height: 60px; background: #ff0000; border: none; color: #fff; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 40px; }
 
-        /* TELA DE PRINT */
-        #telaPrint {
-            position: fixed; inset: 0; background: #000; display: none;
-            flex-direction: column; justify-content: center; align-items: center; z-index: 5000;
-        }
-        .linha-verde { width: 100%; height: 2px; background: #00ffcc; box-shadow: 0 0 15px #00ffcc; margin: 40px 0; }
-        .txt-aprovado { color: #00ffcc; letter-spacing: 5px; font-weight: bold; font-size: 20px; }
-        .val-final { font-size: 95px; font-weight: 900; color: #00ffcc; margin: 10px 0; }
-        .txt-aviso { color: #ff0000; font-weight: bold; margin-top: 25px; font-size: 18px; text-transform: uppercase; }
-        
-        .btn-hide { position: absolute; bottom: 20px; opacity: 0.05; background: none; border: none; color: white; cursor: pointer; }
-    </style>
+/* TELA DE PRINT */
+#telaPrint {
+    position: fixed; inset: 0; background: #000; display: none;
+    flex-direction: column; justify-content: center; align-items: center; z-index: 5000;
+}
+.linha-verde { width: 100%; height: 2px; background: #00ffcc; box-shadow: 0 0 15px #00ffcc; margin: 40px 0; }
+.txt-aprovado { color: #00ffcc; letter-spacing: 5px; font-weight: bold; font-size: 20px; }
+.val-final { font-size: 95px; font-weight: 900; color: #00ffcc; margin: 10px 0; }
+.txt-aviso { color: #ff0000; font-weight: bold; margin-top: 25px; font-size: 18px; text-transform: uppercase; }
+.btn-hide { position: absolute; bottom: 20px; opacity: 0.05; background: none; border: none; color: white; cursor: pointer; }
+</style>
 </head>
 <body>
 
@@ -76,84 +75,101 @@
 </div>
 
 <script>
-    let multX = 1.00; 
-    let rodando = false;
-    let saquesSucesso = 0;
-    let timer = null;
-    let pontoExplosao = 0;
-    const chaves = ["KEY1", "KEY2", "KEY3", "KEY4", "KEY5"];
+let multX = 1.00;
+let rodando = false;
+let saqueRealizado = false;
+let timer = null;
+let pontoExplosao = 0;
+const chaves = ["KEY1", "KEY2", "KEY3", "KEY4", "KEY5"];
+let keysUsadas = [];
+let valorParaSacar = 1.00;
 
-    function entrar() {
-        const k = document.getElementById('keyField').value;
-        if(chaves.includes(k)) {
-            document.getElementById('telaLogin').style.display = 'none';
-            document.getElementById('gameUI').style.display = 'flex';
-            document.getElementById('headerUI').style.display = 'flex';
-        } else { alert("KEY INVÁLIDA!"); }
+function entrar() {
+    const k = document.getElementById('keyField').value.toUpperCase();
+    if(keysUsadas.includes(k)) {
+        alert("ESSA KEY JÁ FOI USADA!");
+        return;
+    }
+    if(chaves.includes(k)) {
+        document.getElementById('telaLogin').style.display = 'none';
+        document.getElementById('gameUI').style.display = 'flex';
+        document.getElementById('headerUI').style.display = 'flex';
+    } else { alert("KEY INVÁLIDA!"); }
+}
+
+function start() {
+    if(rodando) return;
+    if(saqueRealizado) {
+        alert("VOCÊ JÁ SACOU! NÃO PODE JOGAR NOVAMENTE.");
+        return;
     }
 
-    function start() {
-        if(saquesSucesso >= 3) { alert("LIMITE ALCANÇADO"); return; }
-        if(!rodando) {
-            rodando = true;
-            multX = 1.00;
-            document.getElementById('contador').style.color = "#fff";
-            document.getElementById('contador').innerText = "1.00x";
-            document.getElementById('btnPlay').style.visibility = 'hidden';
-            document.getElementById('btnSacar').style.visibility = 'visible';
-            
-            // SORTEIO DA EXPLOSÃO (ENTRE 7.00 E 20.00)
-            pontoExplosao = (Math.random() * (20.00 - 7.00) + 7.00).toFixed(2);
-            
-            timer = setInterval(() => {
-                multX += 0.12 + (Math.random() * 0.1); // Velocidade de subida
-                
-                if(multX >= pontoExplosao) {
-                    explodir();
-                } else {
-                    document.getElementById('contador').innerText = multX.toFixed(2) + "x";
-                }
-            }, 70);
+    rodando = true;
+    multX = 1.00;
+    valorParaSacar = 1.00;
+    document.getElementById('contador').style.color = "#fff";
+    document.getElementById('contador').innerText = "1.00x";
+    document.getElementById('btnPlay').style.visibility = 'hidden';
+    document.getElementById('btnSacar').style.visibility = 'visible';
+    
+    // EXPLOSÃO ALEATÓRIA ENTRE 1.5 E 20.00
+    pontoExplosao = (Math.random() * (20.00 - 1.5) + 1.5).toFixed(2);
+    
+    timer = setInterval(() => {
+        multX += 0.12 + (Math.random() * 0.15);
+
+        if(multX >= pontoExplosao) {
+            travarExplosao();
+        } else {
+            document.getElementById('contador').innerText = multX.toFixed(2) + "x";
+            valorParaSacar = multX; // Guarda último valor antes de explodir
         }
-    }
+    }, 70);
+}
 
-    function explodir() {
-        clearInterval(timer);
-        rodando = false;
-        document.getElementById('contador').innerText = "EXPLODIU!";
-        document.getElementById('contador').style.color = "#ff0000";
-        document.getElementById('btnSacar').style.visibility = 'hidden';
-        
-        setTimeout(() => {
-            alert("A plataforma explodiu em " + pontoExplosao + "x! Tente novamente.");
-            reset();
-        }, 800);
-    }
+function travarExplosao() {
+    clearInterval(timer);
+    rodando = false;
+    document.getElementById('contador').innerText = "EXPLODIU!";
+    document.getElementById('contador').style.color = "#ff0000";
+    document.getElementById('btnSacar').style.visibility = 'visible'; // ainda pode sacar o que acumulou
+    saqueRealizado = true;
 
-    function parar() {
-        if(!rodando) return;
-        clearInterval(timer);
-        rodando = false;
-        saquesSucesso++;
+    // BLOQUEIA A KEY
+    const k = document.getElementById('keyField').value.toUpperCase();
+    keysUsadas.push(k);
 
-        // CONVERSÃO CALIBRADA: 1.00x -> 1.00M | 20.00x -> 1.99M
-        // Fórmula: 1 + ((x - 1) / 19) * 0.99
-        let centavos = Math.floor(((multX - 1) / 19) * 100);
-        if(centavos > 99) centavos = 99;
-        let finalM = "1." + (centavos < 10 ? "0" + centavos : centavos) + "M";
+    alert("A plataforma explodiu! Você só pode sacar o valor acumulado.");
+}
 
-        document.getElementById('saldoTxt').innerText = "SALDO: " + finalM;
-        document.getElementById('vFinal').innerText = finalM;
-        document.getElementById('telaPrint').style.display = 'flex';
-        document.getElementById('btnSacar').style.visibility = 'hidden';
-    }
+function parar() {
+    if(saqueRealizado === false && rodando === false) return;
 
-    function reset() {
-        document.getElementById('telaPrint').style.display = 'none';
-        document.getElementById('btnPlay').style.visibility = 'visible';
-        document.getElementById('contador').innerText = "1.00x";
-        document.getElementById('contador').style.color = "#fff";
-    }
+    clearInterval(timer);
+    rodando = false;
+    saqueRealizado = true;
+
+    // CONVERSÃO CALIBRADA: 1.00x -> 1.00M | 20.00x -> 1.99M
+    let centavos = Math.floor(((valorParaSacar - 1) / 19) * 100);
+    if(centavos > 99) centavos = 99;
+    let finalM = "1." + (centavos < 10 ? "0" + centavos : centavos) + "M";
+
+    document.getElementById('saldoTxt').innerText = "SALDO: " + finalM;
+    document.getElementById('vFinal').innerText = finalM;
+    document.getElementById('telaPrint').style.display = 'flex';
+    document.getElementById('btnSacar').style.visibility = 'hidden';
+}
+
+function reset() {
+    document.getElementById('telaPrint').style.display = 'none';
+    document.getElementById('btnPlay').style.visibility = 'hidden';
+    document.getElementById('contador').innerText = "1.00x";
+    document.getElementById('contador').style.color = "#fff";
+    document.getElementById('gameUI').style.display = 'none';
+    document.getElementById('headerUI').style.display = 'none';
+    document.getElementById('telaLogin').style.display = 'flex';
+    document.getElementById('keyField').value = "";
+}
 </script>
 </body>
 </html>
