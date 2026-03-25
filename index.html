@@ -1,152 +1,190 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Death Store Pro</title>
-<style>
-    body { margin: 0; font-family: 'Arial', sans-serif; background: #000; color: white; overflow-x: hidden; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Death Store Pro</title>
+    <style>
+        /* RESET E PREVENÇÃO DE ERROS DE TOQUE */
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
 
-    /* TOPO */
-    .topo { display: none; flex-direction: column; align-items: center; padding: 15px 20px; background: #000; border-bottom: 2px solid red; }
-    .topo-principal { width: 100%; display: flex; justify-content: space-between; align-items: center; }
-    .nome-loja { font-size: 24px; color: #ff0000; font-weight: bold; text-shadow: 0 0 10px red; }
-    .saldo-box { font-weight: bold; font-size: 18px; color: #00ffcc; }
+        /* HEADER ESTILIZADO */
+        .topo {
+            height: 70px;
+            background: linear-gradient(180deg, #110000 0%, #000 100%);
+            border-bottom: 2px solid #ff0000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2);
+        }
+        .logo { color: #ff0000; font-weight: 900; font-size: 22px; letter-spacing: 2px; text-shadow: 0 0 10px #ff0000; }
+        .saldo { color: #fff; font-weight: bold; font-size: 18px; border: 1px solid #333; padding: 5px 15px; border-radius: 20px; }
 
-    /* BARRA DE PROGRESSO */
-    .bar-container { width: 90%; height: 10px; background: #222; border-radius: 10px; margin-top: 15px; overflow: hidden; border: 1px solid #444; }
-    .bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff0000, #ff4d4d); transition: width 0.1s; }
+        /* ÁREA CENTRAL - O NÚMERO */
+        .main-container { height: 80vh; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; }
+        
+        .display-multiplicador { text-align: center; }
+        #contador { 
+            font-size: 90px; 
+            font-weight: 900; 
+            color: #fff; 
+            text-shadow: 0 0 30px #ff0000; 
+            margin: 0;
+            font-family: monospace;
+        }
+        .label-status { color: #ff0000; text-transform: uppercase; letter-spacing: 5px; font-size: 12px; margin-top: -10px; }
 
-    /* LOGIN */
-    .login, .container { height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-    .box-estilizada { background: #111; padding: 30px; border-radius: 15px; border: 1px solid red; box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); text-align: center; }
-    
-    input { padding: 12px; border-radius: 8px; border: none; margin-bottom: 10px; width: 200px; text-align: center; }
-    button { padding: 12px 25px; border-radius: 8px; border: none; background: red; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-    button:hover { transform: scale(1.05); background: #cc0000; }
+        /* BOTÃO DE AÇÃO (GRANDE E CLICÁVEL) */
+        .botao-master {
+            width: 280px;
+            height: 80px;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.5);
+            transition: 0.2s;
+            position: relative;
+            z-index: 999;
+        }
+        .botao-master:active { transform: scale(0.95); background: #cc0000; }
+        .botao-master.modo-saque { background: #fff; color: #000; box-shadow: 0 0 25px #fff; }
 
-    /* ÁREA DO JOGO */
-    .game-area { width: 300px; height: 300px; border: 4px solid red; border-radius: 50%; position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 30px; box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.2); }
-    #multiFloat { font-size: 45px; font-weight: bold; color: #ff4d4d; text-shadow: 0 0 15px red; }
+        /* TELA DE PRINT (COMPROVANTE) */
+        #telaResultado {
+            position: fixed; inset: 0; background: #000; display: none;
+            flex-direction: column; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .card-saque {
+            background: #0a0a0a;
+            border: 2px solid #ff0000;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            width: 85%;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.4);
+        }
+        .card-saque h2 { color: #ff0000; margin-top: 0; letter-spacing: 2px; }
+        .valor-final { font-size: 60px; font-weight: 900; margin: 20px 0; color: #fff; }
 
-    /* BOTÃO DE AÇÃO PRINCIPAL */
-    .btn-acao { width: 200px; height: 60px; font-size: 20px; border-radius: 50px; background: red; box-shadow: 0 0 20px red; border: none; color: white; font-weight: bold; cursor: pointer; z-index: 100; }
-    .btn-acao.parar { background: #ffcc00; color: black; box-shadow: 0 0 20px #ffcc00; }
-
-    /* TELA DE RESULTADO */
-    #resultadoTela { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 999; }
-</style>
+        /* TELA DE LOGIN */
+        #telaLogin { 
+            position: fixed; inset: 0; background: #000; z-index: 2000; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+        }
+        .input-key { 
+            background: #111; border: 1px solid #ff0000; padding: 15px; color: #fff; 
+            width: 250px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 16px;
+        }
+    </style>
 </head>
 <body>
 
-<div class="login" id="login">
-    <div class="box-estilizada">
-        <h2 style="color:red">DEATH STORE</h2>
-        <input type="text" id="keyInput" placeholder="Digite sua KEY"> <br>
-        <button id="btnEntrar">ENTRAR NO SISTEMA</button>
-    </div>
+<div id="telaLogin">
+    <div class="logo" style="font-size: 35px; margin-bottom: 30px;">DEATH STORE</div>
+    <input type="password" class="input-key" placeholder="DIGITE SUA KEY">
+    <button class="botao-master" onclick="logar()" style="height: 60px; width: 250px;">ENTRAR</button>
 </div>
 
-<div class="topo" id="topo">
-    <div class="topo-principal">
-        <div class="nome-loja">DEATH STORE</div>
-        <div class="saldo-box">💎 <span id="saldo">1.0M</span></div>
-    </div>
-    <div class="bar-container"><div class="bar-fill" id="barFill"></div></div>
+<div class="topo">
+    <div class="logo">DEATH STORE</div>
+    <div class="saldo">💎 1,250,000</div>
 </div>
 
-<div class="container" id="game" style="display:none;">
-    <div class="game-area">
-        <div id="multiFloat">1.00x</div>
+<div class="main-container">
+    <div class="display-multiplicador">
+        <h1 id="contador">1.00x</h1>
+        <div class="label-status" id="statusTxt">Aguardando...</div>
     </div>
-    <button class="btn-acao" id="btnPrincipal">INICIAR</button>
+
+    <button id="btnPrincipal" class="botao-master">INICIAR JOGO</button>
 </div>
 
-<div id="resultadoTela">
-    <div class="box-estilizada">
-        <h2 style="color:#00ffcc">💰 SAQUE CONFIRMADO</h2>
-        <h1 id="valorExibido" style="font-size: 40px;">0.00M</h1>
-        <p id="codigoID" style="color: #aaa;"></p>
-        <p id="dataHora" style="font-size: 12px;"></p>
-        <button onclick="location.reload()" style="background:#444">VOLTAR</button>
-        <button onclick="copiarCodigo()" style="background:#00ffcc; color: black;">COPIAR E PRINTAR</button>
-        <p style="margin-top:15px; font-size: 14px;">📸 Tire o print agora!</p>
+<div id="telaResultado">
+    <div class="card-saque">
+        <h2>SAQUE CONFIRMADO</h2>
+        <div class="valor-final" id="vFinal">1.00M</div>
+        <p id="codigoUnico" style="color: #666; font-family: monospace;"></p>
+        <p id="dataSaque" style="color: #444; font-size: 12px;"></p>
+        <button onclick="location.reload()" style="background:none; border: 1px solid #333; color: #555; padding: 10px; margin-top: 20px; border-radius: 5px;">REINICIAR</button>
     </div>
+    <p style="margin-top: 30px; color: #ff0000; font-weight: bold; animate: pulse 1s infinite;">📸 TIRE O PRINT AGORA</p>
 </div>
 
 <script>
-let multi = 1.0;
-let intervalo = null;
-let jogando = false;
+    let multi = 1.00;
+    let rodando = false;
+    let loop = null;
 
-const btnPrincipal = document.getElementById("btnPrincipal");
-const multiFloat = document.getElementById("multiFloat");
-const barFill = document.getElementById("barFill");
+    const btn = document.getElementById('btnPrincipal');
+    const txtContador = document.getElementById('contador');
+    const txtStatus = document.getElementById('statusTxt');
 
-// LOGIN
-document.getElementById("btnEntrar").onclick = () => {
-    document.getElementById("login").style.display="none";
-    document.getElementById("game").style.display="flex";
-    document.getElementById("topo").style.display="flex";
-};
-
-// LÓGICA DO BOTÃO PRINCIPAL
-btnPrincipal.onclick = () => {
-    if (!jogando) {
-        iniciarJogo();
-    } else {
-        finalizarSaque();
+    function logar() {
+        document.getElementById('telaLogin').style.opacity = '0';
+        setTimeout(() => document.getElementById('telaLogin').style.display = 'none', 300);
     }
-};
 
-function iniciarJogo() {
-    jogando = true;
-    multi = 1.0;
-    btnPrincipal.innerText = "SACAR AGORA";
-    btnPrincipal.classList.add("parar");
-    
-    intervalo = setInterval(() => {
-        multi += 0.03;
-        multiFloat.innerText = multi.toFixed(2) + "x";
-        
-        // Barra de progresso baseada no multiplicador
-        let progresso = (multi - 1) * 20; 
-        barFill.style.width = Math.min(progresso, 100) + "%";
-
-        // Chance aleatória de "quebrar" (crash)
-        if (Math.random() < 0.01) { 
-            boom();
+    // LÓGICA DE CLIQUE ÚNICO (MAIS RÁPIDO E SEM ERRO)
+    btn.onclick = () => {
+        if (!rodando) {
+            iniciar();
+        } else {
+            sacar();
         }
-    }, 100);
-}
+    };
 
-function finalizarSaque() {
-    clearInterval(intervalo);
-    jogando = false;
-    
-    // Preenche os dados da tela de print
-    document.getElementById("valorExibido").innerText = multi.toFixed(2) + "M";
-    document.getElementById("codigoID").innerText = "ID: DS-" + Math.floor(Math.random() * 999999);
-    document.getElementById("dataHora").innerText = new Date().toLocaleString();
-    
-    // Mostra a tela de print
-    document.getElementById("resultadoTela").style.display = "flex";
-}
+    function iniciar() {
+        rodando = true;
+        multi = 1.00;
+        btn.innerText = "SACAR AGORA";
+        btn.classList.add('modo-saque');
+        txtStatus.innerText = "Subindo...";
+        txtStatus.style.color = "#00ff00";
 
-function boom() {
-    clearInterval(intervalo);
-    jogando = false;
-    multiFloat.innerText = "💥";
-    btnPrincipal.innerText = "TENTAR NOVAMENTE";
-    btnPrincipal.classList.remove("parar");
-    barFill.style.width = "0%";
-}
+        loop = setInterval(() => {
+            multi += 0.04;
+            txtContador.innerText = multi.toFixed(2) + "x";
 
-function copiarCodigo() {
-    const texto = document.getElementById("codigoID").innerText;
-    navigator.clipboard.writeText(texto);
-    alert("Código copiado! Pode tirar o print.");
-}
+            // Chance de crash (estouro) - Ajuste aqui a dificuldade
+            if (Math.random() < 0.012) {
+                explodir();
+            }
+        }, 100);
+    }
+
+    function sacar() {
+        clearInterval(loop);
+        rodando = false;
+
+        // Dados do Print
+        document.getElementById('vFinal').innerText = multi.toFixed(2) + "M";
+        document.getElementById('codigoUnico').innerText = "ID: " + Math.random().toString(36).substr(2, 9).toUpperCase();
+        document.getElementById('dataSaque').innerText = new Date().toLocaleString('pt-BR');
+
+        // Mostra a tela de resultado
+        document.getElementById('telaResultado').style.display = 'flex';
+    }
+
+    function explodir() {
+        clearInterval(loop);
+        rodando = false;
+        txtContador.innerText = "💥";
+        txtContador.style.textShadow = "0 0 30px #ff0000";
+        txtStatus.innerText = "CRASHED!";
+        txtStatus.style.color = "#ff0000";
+        
+        btn.innerText = "TENTAR NOVAMENTE";
+        btn.classList.remove('modo-saque');
+    }
 </script>
+
 </body>
 </html>
