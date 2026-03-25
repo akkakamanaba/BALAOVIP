@@ -4,24 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Death Store Pro</title>
-
 <style>
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background: radial-gradient(circle at top, #1a0000, #000);
+  background: #000 url('https://i.imgur.com/L0GqG6t.jpg') center top / cover no-repeat;
   color: white;
+  overflow-x: hidden;
 }
 
 /* TOPO */
 .topo {
   display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(0,0,0,0.85);
+  border-bottom: 2px solid red;
+}
+
+.topo-principal {
+  width: 100%;
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
-  background: #000;
-  border-bottom: 2px solid red;
-  font-size: 22px;
+}
+
+.nome-loja {
+  font-size: 30px;
+  color: #ff0000;
+  font-weight: bold;
+  text-shadow: 3px 3px 8px black;
 }
 
 .saldo-box {
@@ -29,19 +42,42 @@ body {
   align-items: center;
   gap: 5px;
   font-weight: bold;
+  font-size: 20px;
 }
 
 .sacar-topo {
   background: red;
-  padding: 10px 20px;
+  padding: 10px 25px;
   border-radius: 12px;
   cursor: pointer;
   font-weight: bold;
-  transition: transform 0.2s;
+  transition: all 0.3s;
+  box-shadow: 0 0 20px red;
 }
 
 .sacar-topo:hover {
-  transform: scale(1.05);
+  transform: scale(1.1);
+  box-shadow: 0 0 40px red;
+}
+
+/* GRÁFICO */
+.bar-container {
+  width: 100%;
+  height: 20px;
+  background: #222;
+  border-radius: 10px;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-fill {
+  position: absolute;
+  width: 0%;
+  height: 100%;
+  background: red;
+  border-radius: 10px;
+  transition: width 0.05s;
 }
 
 /* LOGIN */
@@ -55,9 +91,9 @@ body {
 
 .login-box, .box {
   background: #111;
-  padding: 25px 30px;
+  padding: 25px 35px;
   border-radius: 15px;
-  box-shadow: 0 0 30px red;
+  box-shadow: 0 0 35px red;
   text-align: center;
 }
 
@@ -66,36 +102,38 @@ body {
   border-radius: 8px;
   border: none;
   margin-top: 15px;
-  width: 200px;
+  width: 220px;
   text-align: center;
   font-weight: bold;
 }
 
 .login-box button {
   margin-top: 15px;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 25px;
+  border-radius: 10px;
   border: none;
   background: red;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.3s;
+  box-shadow: 0 0 15px red;
 }
 
 .login-box button:hover {
-  transform: scale(1.05);
+  transform: scale(1.1);
+  box-shadow: 0 0 30px red;
 }
 
 /* GAME */
 .game-area {
-  width: 360px;
-  height: 400px;
+  width: 380px;
+  height: 420px;
   border: 3px solid red;
   border-radius: 25px;
   position: relative;
   overflow: hidden;
   margin-top: 25px;
-  background: radial-gradient(circle, #000, #300000);
+  background: rgba(0,0,0,0.85);
 }
 
 #balao {
@@ -113,16 +151,17 @@ body {
   font-weight:bold;
   background: radial-gradient(circle at 30% 30%, #ff1a1a, #660000);
   box-shadow: 0 0 30px red;
-  transition: bottom 0.05s;
+  transition: bottom 0.05s, transform 0.2s;
 }
 
 #multiFloat {
   position: absolute;
   left: 65%;
   bottom: 140px;
-  font-size: 24px;
+  font-size: 26px;
   color: #ff4d4d;
   font-weight: bold;
+  text-shadow: 1px 1px 5px black;
 }
 
 /* BOTÃO SEGURAR */
@@ -135,11 +174,13 @@ body {
   font-weight: bold;
   font-size: 16px;
   user-select: none;
-  transition: transform 0.2s;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 0 15px red;
 }
 
 .segurar:hover {
-  transform: scale(1.05);
+  transform: scale(1.1);
+  box-shadow: 0 0 30px red;
 }
 
 /* RESULTADO SAQUE */
@@ -147,11 +188,11 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: #000000dd;
+  background: #000000cc;
   display: none;
   justify-content: center;
   align-items: center;
-  flex-direction:column;
+  flex-direction: column;
 }
 
 #resultadoTela .box h1 {
@@ -164,10 +205,27 @@ body {
   margin: 5px 0;
 }
 
+/* CONFETE */
+.confete {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: red;
+  opacity: 0.8;
+  top: -10px;
+  border-radius: 50%;
+  animation: cair 2s linear forwards;
+}
+
+@keyframes cair {
+  to { transform: translateY(500px) rotate(360deg); opacity:0; }
+}
 </style>
 </head>
-
 <body>
+
+<audio id="somExplosao" src="https://www.myinstants.com/media/sounds/explosion.mp3" preload="auto"></audio>
+<audio id="somConfete" src="https://www.myinstants.com/media/sounds/cheering-crowd.mp3" preload="auto"></audio>
 
 <!-- LOGIN -->
 <div class="login" id="login">
@@ -180,10 +238,14 @@ body {
 
 <!-- TOPO -->
 <div class="topo" id="topo">
-  <div class="saldo-box">
-    💎 <span id="saldo">1.0M</span>
+  <div class="topo-principal">
+    <div class="nome-loja">DEATH STORE</div>
+    <div class="saldo-box">💎 <span id="saldo">1.0M</span></div>
+    <div class="sacar-topo" id="btnSacar">SACAR</div>
   </div>
-  <div class="sacar-topo" id="btnSacar">SACAR</div>
+  <div class="bar-container">
+    <div class="bar-fill" id="barFill"></div>
+  </div>
 </div>
 
 <!-- JOGO -->
@@ -207,7 +269,6 @@ body {
 </div>
 
 <script>
-// SALDO INICIAL
 let saldo = 1_000_000;
 let multi = 1;
 let intervalo = null;
@@ -225,9 +286,14 @@ const balao = document.getElementById("balao");
 const multiFloat = document.getElementById("multiFloat");
 const btnSegurar = document.getElementById("btnSegurar");
 const btnSacar = document.getElementById("btnSacar");
+const barFill = document.getElementById("barFill");
+const gameArea = document.querySelector('.game-area');
+
+const somExplosao = document.getElementById("somExplosao");
+const somConfete = document.getElementById("somConfete");
 
 function atualizar(){
-  document.getElementById("saldo").innerText = (saldo/1_000_000).toFixed(1) + "M";
+  document.getElementById("saldo").innerText = (saldo/1_000_000).toFixed(2) + "M";
 }
 
 // LOGIN
@@ -239,12 +305,12 @@ document.getElementById("btnEntrar").onclick = () => {
     document.getElementById("game").style.display="flex";
     document.getElementById("topo").style.display="flex";
     atualizar();
+    iniciarFakePlayers();
   } else {
     alert("Key inválida ou já usada");
   }
 };
 
-// SEGURAR
 btnSegurar.addEventListener("mousedown", iniciar);
 btnSegurar.addEventListener("touchstart", iniciar);
 btnSegurar.addEventListener("mouseup", parar);
@@ -260,57 +326,61 @@ function iniciar(){
 
   intervalo = setInterval(()=>{
     tempo += 50;
-    let progresso = tempo / 30000;
-    multi = 1 + (0.8 * Math.pow(progresso,2));
+    let progresso = tempo/30000;
+    multi = 1 + (0.8*Math.pow(progresso,2));
 
-    let preview = Math.floor(1_000_000 * multi);
-    document.getElementById("saldo").innerText = (preview/1_000_000).toFixed(2) + "M";
+    if(multi > 1.8) multi = 1.8; // limite máximo
 
-    let chance = 0.01 + (progresso * 0.08);
-    if(Math.random() < chance || multi >= 1.8){
+    document.getElementById("saldo").innerText = (Math.floor(1_000_000*multi)/1_000_000).toFixed(2)+"M";
+    multiFloat.innerText = multi.toFixed(2)+"x";
+    barFill.style.width = (multi/1.8*100)+"%";
+
+    let chance = 0.01 + (progresso *0.08);
+    if(Math.random()<chance || multi>=1.8){
       explodir();
       return;
     }
 
-    multiFloat.innerText = multi.toFixed(2)+"x";
+    if(multi >= 1.75){
+      somConfete.play();
+      criarConfete(20);
+    }
 
-    let altura = parseInt(balao.style.bottom) || 0;
-    altura += 4; // sobe mais rápido
+    let altura = parseInt(balao.style.bottom)||0;
+    altura += 4;
     balao.style.bottom = altura+"px";
-
   },50);
 }
 
-function parar(){
-  if(!jogando) return;
-  clearInterval(intervalo);
-  jogando = false;
-}
+function parar(){ if(!jogando) return; clearInterval(intervalo); jogando=false; }
 
-function explodir(){
-  clearInterval(intervalo);
-  jogando = false;
-  multiFloat.innerText = "💥 EXPLODIU";
+function explodir(){ clearInterval(intervalo); jogando=false; multiFloat.innerText="💥 EXPLODIU"; somExplosao.play(); criarConfete(30); }
+
+function criarConfete(qtd){ for(let i=0;i<qtd;i++){ let c=document.createElement('div'); c.classList.add('confete'); c.style.left=Math.random()*gameArea.offsetWidth+'px'; gameArea.appendChild(c); setTimeout(()=>c.remove(),2000); } }
+
+// FAKE PLAYERS
+function iniciarFakePlayers(){
+  const bar = document.querySelector('.bar-container');
+  for(let i=0;i<5;i++){
+    let dot = document.createElement('div');
+    dot.classList.add('player-dot');
+    dot.style.left = Math.random()*bar.offsetWidth+"px";
+    bar.appendChild(dot);
+    setInterval(()=>{
+      dot.style.left = Math.random()*bar.offsetWidth+"px";
+    },1000);
+  }
 }
 
 // SACAR
 btnSacar.onclick = () => {
-  if(!usado){
-    alert("Você precisa jogar primeiro!");
-    return;
-  }
-
-  saldo = Math.floor(1_000_000 * multi);
-  let valorM = (saldo/1_000_000).toFixed(2) + "M";
-  let codigo = "DS-" + Math.floor(Math.random()*999999);
-
-  document.getElementById("valor").innerText = "💎 " + valorM;
-  document.getElementById("codigo").innerText = "Código: " + codigo;
-
+  let valorM = (Math.floor(1_000_000*multi)/1_000_000).toFixed(2)+"M";
+  let codigo = "DS-"+Math.floor(Math.random()*999999);
+  document.getElementById("valor").innerText = "💎 "+valorM;
+  document.getElementById("codigo").innerText = "Código: "+codigo;
   document.getElementById("resultadoTela").style.display="flex";
   atualizar();
 }
 </script>
-
 </body>
 </html>
