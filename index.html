@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Death Store Pro</title>
+    <title>Death Store Pro - Extreme</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; background: #000; color: #fff; font-family: 'Arial', sans-serif; overflow: hidden; }
 
-        /* LOGIN TOTALMENTE LIMPO */
+        /* LOGIN */
         #telaLogin { 
             position: fixed; inset: 0; background: #000; z-index: 9999; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
@@ -78,9 +78,9 @@
 <script>
     let multX = 1.00; 
     let rodando = false;
-    let saques = 0;
+    let saquesSucesso = 0;
     let timer = null;
-    // Chaves permanecem ocultas no código
+    let pontoExplosao = 0;
     const chaves = ["KEY1", "KEY2", "KEY3", "KEY4", "KEY5"];
 
     function entrar() {
@@ -89,40 +89,61 @@
             document.getElementById('telaLogin').style.display = 'none';
             document.getElementById('gameUI').style.display = 'flex';
             document.getElementById('headerUI').style.display = 'flex';
-        } else { 
-            alert("ACESSO NEGADO: KEY INVÁLIDA!"); 
-        }
+        } else { alert("KEY INVÁLIDA!"); }
     }
 
     function start() {
-        if(saques >= 3) { alert("SISTEMA BLOQUEADO"); return; }
+        if(saquesSucesso >= 3) { alert("LIMITE ALCANÇADO"); return; }
         if(!rodando) {
             rodando = true;
             multX = 1.00;
+            document.getElementById('contador').style.color = "#fff";
+            document.getElementById('contador').innerText = "1.00x";
             document.getElementById('btnPlay').style.visibility = 'hidden';
             document.getElementById('btnSacar').style.visibility = 'visible';
             
+            // SORTEIO DA EXPLOSÃO (ENTRE 7.00 E 20.00)
+            pontoExplosao = (Math.random() * (20.00 - 7.00) + 7.00).toFixed(2);
+            
             timer = setInterval(() => {
-                multX += 0.04 + (Math.random() * 0.1);
-                if(multX >= 10.00) { multX = 10.00; clearInterval(timer); }
-                document.getElementById('contador').innerText = multX.toFixed(2) + "x";
-            }, 80);
+                multX += 0.12 + (Math.random() * 0.1); // Velocidade de subida
+                
+                if(multX >= pontoExplosao) {
+                    explodir();
+                } else {
+                    document.getElementById('contador').innerText = multX.toFixed(2) + "x";
+                }
+            }, 70);
         }
+    }
+
+    function explodir() {
+        clearInterval(timer);
+        rodando = false;
+        document.getElementById('contador').innerText = "EXPLODIU!";
+        document.getElementById('contador').style.color = "#ff0000";
+        document.getElementById('btnSacar').style.visibility = 'hidden';
+        
+        setTimeout(() => {
+            alert("A plataforma explodiu em " + pontoExplosao + "x! Tente novamente.");
+            reset();
+        }, 800);
     }
 
     function parar() {
         if(!rodando) return;
         clearInterval(timer);
         rodando = false;
-        saques++;
+        saquesSucesso++;
 
-        // Multiplicador 1-10x vira Valor 1.00-1.99M
-        let d = Math.floor((multX - 1) * 11); 
-        if(d > 99) d = 99;
-        let finalVal = "1." + (d < 10 ? "0" + d : d) + "M";
+        // CONVERSÃO CALIBRADA: 1.00x -> 1.00M | 20.00x -> 1.99M
+        // Fórmula: 1 + ((x - 1) / 19) * 0.99
+        let centavos = Math.floor(((multX - 1) / 19) * 100);
+        if(centavos > 99) centavos = 99;
+        let finalM = "1." + (centavos < 10 ? "0" + centavos : centavos) + "M";
 
-        document.getElementById('saldoTxt').innerText = "SALDO: " + finalVal;
-        document.getElementById('vFinal').innerText = finalVal;
+        document.getElementById('saldoTxt').innerText = "SALDO: " + finalM;
+        document.getElementById('vFinal').innerText = finalM;
         document.getElementById('telaPrint').style.display = 'flex';
         document.getElementById('btnSacar').style.visibility = 'hidden';
     }
@@ -131,6 +152,7 @@
         document.getElementById('telaPrint').style.display = 'none';
         document.getElementById('btnPlay').style.visibility = 'visible';
         document.getElementById('contador').innerText = "1.00x";
+        document.getElementById('contador').style.color = "#fff";
     }
 </script>
 </body>
