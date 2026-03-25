@@ -8,28 +8,43 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial;
-  color: white;
+  font-family: 'Arial', sans-serif;
   background: radial-gradient(circle at top, #1a0000, #000);
+  color: white;
 }
 
 /* TOPO */
 .topo {
   display: none;
   justify-content: space-between;
-  padding: 15px;
+  align-items: center;
+  padding: 15px 20px;
   background: #000;
   border-bottom: 2px solid red;
+  font-size: 22px;
+}
+
+.saldo-box {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: bold;
 }
 
 .sacar-topo {
   background: red;
-  padding: 8px 15px;
-  border-radius: 10px;
+  padding: 10px 20px;
+  border-radius: 12px;
   cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.2s;
 }
 
-/* TELAS */
+.sacar-topo:hover {
+  transform: scale(1.05);
+}
+
+/* LOGIN */
 .login, .container {
   height: 100vh;
   display: flex;
@@ -40,72 +55,115 @@ body {
 
 .login-box, .box {
   background: #111;
-  padding: 20px;
+  padding: 25px 30px;
   border-radius: 15px;
-  box-shadow: 0 0 25px red;
+  box-shadow: 0 0 30px red;
   text-align: center;
 }
 
-/* JOGO */
-.game-area {
-  width: 320px;
-  height: 380px;
-  border: 2px solid red;
-  border-radius: 20px;
-  position: relative;
-  overflow: hidden;
-  margin-top: 20px;
-  background: radial-gradient(circle, #000, #200000);
+.login-box input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 15px;
+  width: 200px;
+  text-align: center;
+  font-weight: bold;
 }
 
-/* BALÃO */
+.login-box button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: red;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.login-box button:hover {
+  transform: scale(1.05);
+}
+
+/* GAME */
+.game-area {
+  width: 360px;
+  height: 400px;
+  border: 3px solid red;
+  border-radius: 25px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 25px;
+  background: radial-gradient(circle, #000, #300000);
+}
+
 #balao {
   position: absolute;
   bottom: 0;
   left: 50%;
-  transform: translateX(-50%) scale(1);
-  width: 100px;
-  height: 120px;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 140px;
   border-radius: 50%;
   display:flex;
   justify-content:center;
   align-items:center;
-  text-align:center;
-  font-size:11px;
+  font-size:14px;
   font-weight:bold;
   background: radial-gradient(circle at 30% 30%, #ff1a1a, #660000);
-  box-shadow: 0 0 25px red;
+  box-shadow: 0 0 30px red;
+  transition: bottom 0.05s;
 }
 
-/* MULTIPLICADOR */
 #multiFloat {
   position: absolute;
-  left: 60%;
-  bottom: 120px;
-  font-size: 20px;
+  left: 65%;
+  bottom: 140px;
+  font-size: 24px;
   color: #ff4d4d;
+  font-weight: bold;
 }
 
 /* BOTÃO SEGURAR */
 .segurar {
-  margin-top: 15px;
+  margin-top: 20px;
   background: red;
-  padding: 12px 25px;
-  border-radius: 10px;
+  padding: 14px 30px;
+  border-radius: 12px;
   cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  user-select: none;
+  transition: transform 0.2s;
 }
 
-/* SAQUE */
+.segurar:hover {
+  transform: scale(1.05);
+}
+
+/* RESULTADO SAQUE */
 #resultadoTela {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: #000000ee;
+  background: #000000dd;
   display: none;
   justify-content: center;
   align-items: center;
   flex-direction:column;
 }
+
+#resultadoTela .box h1 {
+  font-size: 36px;
+  margin: 10px 0;
+}
+
+#resultadoTela .box p {
+  font-size: 16px;
+  margin: 5px 0;
+}
+
 </style>
 </head>
 
@@ -122,8 +180,10 @@ body {
 
 <!-- TOPO -->
 <div class="topo" id="topo">
-  💎 <span id="saldo">1,000,000</span>
-  <div class="sacar-topo" onclick="sacarTudo()">SACAR</div>
+  <div class="saldo-box">
+    💎 <span id="saldo">1.0M</span>
+  </div>
+  <div class="sacar-topo" id="btnSacar">SACAR</div>
 </div>
 
 <!-- JOGO -->
@@ -132,7 +192,6 @@ body {
     <div id="balao">SEGURE</div>
     <div id="multiFloat">1.00x</div>
   </div>
-
   <div class="segurar" id="btnSegurar">SEGURAR</div>
 </div>
 
@@ -142,40 +201,43 @@ body {
     <h2>💰 SAQUE ÚNICO</h2>
     <h1 id="valor"></h1>
     <p id="codigo"></p>
-
     <p>🎉 Parabéns, saque realizado com sucesso!</p>
-    <p>📸 Tire print desta tela</p>
-    <p>🎫 Abra um ticket na opção "Sacar" e envie o comprovante</p>
+    <p>📸 Tire print e envie para verificação</p>
   </div>
 </div>
 
 <script>
-let saldo = 1000000;
+// SALDO INICIAL
+let saldo = 1_000_000;
 let multi = 1;
-let intervalo;
+let intervalo = null;
 let jogando = false;
 let usado = false;
 
-const keys = {"KEY1":true,"KEY2":true,"KEY3":true};
+// KEYS
+const keys = {
+  "KEY1":true,"KEY2":true,"KEY3":true,"KEY4":true,"KEY5":true,
+  "KEY6":true,"KEY7":true,"KEY8":true,"KEY9":true,"KEY10":true,
+  "KEY11":true,"KEY12":true,"KEY13":true,"KEY14":true,"KEY15":true
+};
 
 const balao = document.getElementById("balao");
 const multiFloat = document.getElementById("multiFloat");
+const btnSegurar = document.getElementById("btnSegurar");
+const btnSacar = document.getElementById("btnSacar");
 
 function atualizar(){
-  document.getElementById("saldo").innerText = saldo.toLocaleString();
+  document.getElementById("saldo").innerText = (saldo/1_000_000).toFixed(1) + "M";
 }
 
 // LOGIN
 document.getElementById("btnEntrar").onclick = () => {
   let key = document.getElementById("keyInput").value.trim();
-
   if(keys[key]){
     keys[key] = false;
-
     document.getElementById("login").style.display="none";
     document.getElementById("game").style.display="flex";
     document.getElementById("topo").style.display="flex";
-
     atualizar();
   } else {
     alert("Key inválida ou já usada");
@@ -183,30 +245,29 @@ document.getElementById("btnEntrar").onclick = () => {
 };
 
 // SEGURAR
-document.getElementById("btnSegurar").onclick = () => {
+btnSegurar.addEventListener("mousedown", iniciar);
+btnSegurar.addEventListener("touchstart", iniciar);
+btnSegurar.addEventListener("mouseup", parar);
+btnSegurar.addEventListener("mouseleave", parar);
+btnSegurar.addEventListener("touchend", parar);
 
+function iniciar(){
   if(jogando || usado) return;
-
   usado = true;
   jogando = true;
   multi = 1;
-
   let tempo = 0;
 
   intervalo = setInterval(()=>{
-
     tempo += 50;
     let progresso = tempo / 30000;
+    multi = 1 + (0.8 * Math.pow(progresso,2));
 
-    multi = 1 + (0.8 * Math.pow(progresso, 2));
-
-    // saldo em tempo real
-    let preview = Math.floor(1000000 * multi);
-    document.getElementById("saldo").innerText = preview.toLocaleString();
+    let preview = Math.floor(1_000_000 * multi);
+    document.getElementById("saldo").innerText = (preview/1_000_000).toFixed(2) + "M";
 
     let chance = 0.01 + (progresso * 0.08);
-
-    if(Math.random() < chance || multi >= 1.80){
+    if(Math.random() < chance || multi >= 1.8){
       explodir();
       return;
     }
@@ -214,13 +275,18 @@ document.getElementById("btnSegurar").onclick = () => {
     multiFloat.innerText = multi.toFixed(2)+"x";
 
     let altura = parseInt(balao.style.bottom) || 0;
-    altura += 2 + (progresso * 3);
+    altura += 4; // sobe mais rápido
     balao.style.bottom = altura+"px";
 
   },50);
-};
+}
 
-// EXPLOSÃO
+function parar(){
+  if(!jogando) return;
+  clearInterval(intervalo);
+  jogando = false;
+}
+
 function explodir(){
   clearInterval(intervalo);
   jogando = false;
@@ -228,23 +294,21 @@ function explodir(){
 }
 
 // SACAR
-function sacarTudo(){
-
+btnSacar.onclick = () => {
   if(!usado){
     alert("Você precisa jogar primeiro!");
     return;
   }
 
-  clearInterval(intervalo);
-
-  saldo = Math.floor(1000000 * multi);
-
+  saldo = Math.floor(1_000_000 * multi);
+  let valorM = (saldo/1_000_000).toFixed(2) + "M";
   let codigo = "DS-" + Math.floor(Math.random()*999999);
 
-  document.getElementById("valor").innerText = "💎 " + saldo.toLocaleString();
+  document.getElementById("valor").innerText = "💎 " + valorM;
   document.getElementById("codigo").innerText = "Código: " + codigo;
 
   document.getElementById("resultadoTela").style.display="flex";
+  atualizar();
 }
 </script>
 
