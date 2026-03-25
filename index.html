@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Death Store - Premium</title>
+    <title>Death Store Pro</title>
     <style>
-        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; background: #000; color: #fff; font-family: 'Arial', sans-serif; overflow: hidden; }
 
-        /* LOGIN LOCAL */
+        /* LOGIN ESTILO VERSÃO 1 (LIMPO) */
         #telaLogin { 
             position: fixed; inset: 0; background: #000; z-index: 9999; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
         }
-        .login-box { border: 2px solid #ff0000; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 0 20px #ff0000; }
-        input { padding: 15px; width: 260px; border-radius: 10px; border: 1px solid #ff0000; background: #111; color: #fff; margin-bottom: 20px; text-align: center; font-size: 18px; }
+        .logo-v1 { color: #ff0000; font-size: 38px; font-weight: 900; letter-spacing: 3px; margin-bottom: 30px; text-shadow: 0 0 15px #ff0000; }
+        .input-v1 { background: #111; border: 1px solid #ff0000; padding: 15px; color: #fff; width: 260px; border-radius: 5px; margin-bottom: 20px; text-align: center; font-size: 16px; }
+        .btn-entrar-v1 { width: 260px; height: 60px; background: #ff0000; color: #fff; border: none; font-size: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
         /* HEADER */
         .header { 
@@ -30,121 +31,105 @@
 
         /* JOGO */
         .container { height: 100vh; display: none; flex-direction: column; justify-content: center; align-items: center; }
-        #contador { font-size: 80px; font-weight: 900; color: #fff; text-shadow: 0 0 25px #ff0000; font-family: monospace; }
-        .btn-iniciar { width: 220px; height: 65px; background: #ff0000; border: none; color: #fff; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 40px; }
+        #contador { font-size: 90px; font-weight: 900; text-shadow: 0 0 20px #ff0000; font-family: monospace; }
+        .btn-play { width: 220px; height: 60px; background: #ff0000; border: none; color: #fff; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 40px; }
 
-        /* PRINT FINAL */
+        /* TELA DE PRINT */
         #telaPrint {
             position: fixed; inset: 0; background: #000; display: none;
             flex-direction: column; justify-content: center; align-items: center; z-index: 5000;
         }
         .linha-verde { width: 100%; height: 2px; background: #00ffcc; box-shadow: 0 0 15px #00ffcc; margin: 40px 0; }
-        .texto-aprovado { color: #00ffcc; letter-spacing: 5px; font-weight: bold; font-size: 20px; text-shadow: 0 0 10px #00ffcc; }
-        .valor-final { font-size: 90px; font-weight: 900; color: #00ffcc; margin: 10px 0; }
-        .obs-print { color: #ff0000; font-weight: bold; margin-top: 25px; font-size: 18px; text-transform: uppercase; }
+        .txt-aprovado { color: #00ffcc; letter-spacing: 5px; font-weight: bold; font-size: 20px; }
+        .val-final { font-size: 95px; font-weight: 900; color: #00ffcc; margin: 10px 0; }
+        .txt-aviso { color: #ff0000; font-weight: bold; margin-top: 25px; font-size: 18px; text-transform: uppercase; }
         
-        .btn-voltar { position: absolute; bottom: 20px; opacity: 0.1; background: none; border: none; color: white; cursor: pointer; }
+        .btn-hide { position: absolute; bottom: 20px; opacity: 0.05; background: none; border: none; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="telaLogin">
-    <div class="login-box">
-        <h1 style="color:red">DEATH STORE</h1>
-        <input type="text" id="keyField" placeholder="CHAVE DE ACESSO"> <br>
-        <button class="btn-iniciar" onclick="logar()" style="margin-top:0;">ENTRAR</button>
-        <p style="color: #333; font-size: 10px; margin-top: 15px;">KEYS LOCAIS: DS-01, DS-02, DS-03, DS-04, DS-05</p>
-    </div>
+    <div class="logo-v1">DEATH STORE</div>
+    <input type="text" id="keyField" class="input-v1" placeholder="KEY DE ACESSO">
+    <button class="btn-entrar-v1" onclick="entrar()">ENTRAR</button>
 </div>
 
-<div class="header" id="uiHeader">
-    <button id="btnSacar" onclick="finalizar()">SACAR</button>
-    <div class="saldo-box" id="saldoDisplay">SALDO: 1.00M</div>
+<div class="header" id="headerUI">
+    <button id="btnSacar" onclick="parar()">SACAR</button>
+    <div class="saldo-box" id="saldoTxt">SALDO: 1.00M</div>
 </div>
 
-<div class="container" id="jogoContainer">
-    <div id="contador">1.00M</div>
-    <button class="btn-iniciar" id="btnPlay" onclick="jogar()">INICIAR</button>
+<div class="container" id="gameUI">
+    <div id="contador">1.00x</div>
+    <button class="btn-play" id="btnPlay" onclick="start()">INICIAR JOGO</button>
 </div>
 
 <div id="telaPrint">
     <div class="linha-verde"></div>
-    <div class="texto-aprovado">SAQUE APROVADO</div>
-    <div class="valor-final" id="vFinal">1.00M</div>
+    <div class="txt-aprovado">SAQUE APROVADO</div>
+    <div class="val-final" id="vFinal">1.00M</div>
     <div style="color: #444; font-family: monospace;">TRANS-ID: TZB3RPP</div>
     <div class="linha-verde"></div>
-    <div class="obs-print">📸 TIRE SEU PRINT AGORA</div>
-    <button class="btn-voltar" onclick="resetar()">reiniciar</button>
+    <div class="txt-aviso">📸 TIRE SEU PRINT AGORA</div>
+    <button class="btn-hide" onclick="reset()">reiniciar</button>
 </div>
 
 <script>
-    let mult = 0; // Vai de 0 a 99
-    let saldoBase = 1.00;
+    let multX = 1.00; 
     let rodando = false;
-    let limite = 0;
+    let saques = 0;
     let timer = null;
-    
-    // KEYS LOCAIS
-    const keysLocais = ["DS-01", "DS-02", "DS-03", "DS-04", "DS-05"];
+    // AS KEYS ESTÃO AQUI NO CÓDIGO, MAS NÃO APARECEM MAIS NA TELA
+    const chaves = ["KEY1", "KEY2", "KEY3", "KEY4", "KEY5"];
 
-    function logar() {
+    function entrar() {
         const k = document.getElementById('keyField').value;
-        if(keysLocais.includes(k)) {
+        if(chaves.includes(k)) {
             document.getElementById('telaLogin').style.display = 'none';
-            document.getElementById('jogoContainer').style.display = 'flex';
-            document.getElementById('uiHeader').style.display = 'flex';
+            document.getElementById('gameUI').style.display = 'flex';
+            document.getElementById('headerUI').style.display = 'flex';
         } else { alert("KEY INVÁLIDA!"); }
     }
 
-    function jogar() {
-        if(limite >= 3) {
-            alert("LIMITE ATINGIDO!");
-            return;
-        }
+    function start() {
+        if(saques >= 3) { alert("SISTEMA BLOQUEADO"); return; }
         if(!rodando) {
             rodando = true;
-            mult = 0;
+            multX = 1.00;
             document.getElementById('btnPlay').style.visibility = 'hidden';
             document.getElementById('btnSacar').style.visibility = 'visible';
             
             timer = setInterval(() => {
-                // Incrementa os decimais aleatoriamente
-                mult += Math.floor(Math.random() * 5) + 1;
-                
-                // Trava no .99 para nunca mudar o 1 da frente
-                if(mult > 99) mult = 99;
-
-                // Formata para aparecer sempre 1.XX M
-                let exibicao = "1." + (mult < 10 ? "0" + mult : mult) + "M";
-                document.getElementById('contador').innerText = exibicao;
+                multX += 0.05 + (Math.random() * 0.1);
+                if(multX >= 10.00) { multX = 10.00; clearInterval(timer); }
+                document.getElementById('contador').innerText = multX.toFixed(2) + "x";
             }, 80);
         }
     }
 
-    function finalizar() {
+    function parar() {
         if(!rodando) return;
         clearInterval(timer);
         rodando = false;
-        limite++;
+        saques++;
 
-        let valorFinalStr = "1." + (mult < 10 ? "0" + mult : mult) + "M";
-        
-        // Atualiza o saldo do topo somando apenas a "gordura" do saque
-        saldoBase += (mult / 100);
-        document.getElementById('saldoDisplay').innerText = "SALDO: " + saldoBase.toFixed(2) + "M";
+        // Transforma o multiplicador (1.00x - 10.00x) em valor real (1.00M - 1.99M)
+        let decimais = Math.floor((multX - 1) * 11); 
+        if(decimais > 99) decimais = 99;
+        let finalM = "1." + (decimais < 10 ? "0" + decimais : decimais) + "M";
 
-        // Prepara Print
-        document.getElementById('vFinal').innerText = valorFinalStr;
+        document.getElementById('saldoTxt').innerText = "SALDO: " + finalM;
+        document.getElementById('vFinal').innerText = finalM;
         document.getElementById('telaPrint').style.display = 'flex';
         document.getElementById('btnSacar').style.visibility = 'hidden';
     }
 
-    function resetar() {
+    function reset() {
         document.getElementById('telaPrint').style.display = 'none';
         document.getElementById('btnPlay').style.visibility = 'visible';
-        document.getElementById('contador').innerText = "1.00M";
+        document.getElementById('contador').innerText = "1.00x";
     }
 </script>
-
 </body>
 </html>
