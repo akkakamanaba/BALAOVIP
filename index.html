@@ -3,143 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Death Store Pro</title>
+    <title>Death Store Pro - Oficial</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: #000; color: #fff; font-family: 'Arial', sans-serif; overflow: hidden; }
 
-        /* LOGIN */
+        /* TELA DE LOGIN */
         #telaLogin { 
             position: fixed; inset: 0; background: #000; z-index: 9999; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
         }
-        .login-box { border: 1px solid #ff0000; padding: 40px; border-radius: 15px; text-align: center; background: #050505; }
-        input { padding: 15px; width: 250px; border-radius: 8px; border: 1px solid #ff0000; background: #000; color: #fff; margin-bottom: 20px; text-align: center; }
+        .login-box { border: 1px solid #ff0000; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 0 20px #ff0000; }
+        input { padding: 15px; width: 250px; border-radius: 8px; border: 1px solid #ff0000; background: #111; color: #fff; margin-bottom: 20px; text-align: center; font-size: 16px; }
         
-        /* HEADER COM SACAR E SALDO */
-        .header { 
+        /* HEADER (SACAR NA ESQUERDA, SALDO NA DIREITA) */
+        .topo-interface { 
             display: none; justify-content: space-between; align-items: center; 
-            padding: 20px; position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 15px 20px; position: fixed; top: 0; width: 100%; z-index: 100;
         }
-        .btn-header-sacar { background: #00ffcc; color: #000; padding: 10px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; }
-        .saldo-box { background: #111; border: 1px solid #00ffcc; padding: 10px 20px; border-radius: 5px; color: #00ffcc; font-weight: bold; }
+        .btn-sacar-topo { background: #00ffcc; color: #000; padding: 12px 25px; border-radius: 8px; font-weight: 900; border: none; cursor: pointer; box-shadow: 0 0 15px #00ffcc; }
+        .saldo-box { border: 1px solid #00ffcc; padding: 10px 20px; border-radius: 8px; color: #00ffcc; font-weight: bold; }
 
-        /* ÁREA CENTRAL */
-        .container { height: 100vh; display: none; flex-direction: column; justify-content: center; align-items: center; }
-        #contador { font-size: 80px; font-weight: bold; color: #fff; text-shadow: 0 0 20px #ff0000; }
-        
-        /* TELA DE PRINT (IGUAL À IMAGEM) */
+        /* ÁREA DO JOGO */
+        .game-container { height: 100vh; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        #contador { font-size: 90px; font-weight: 900; color: #fff; text-shadow: 0 0 30px #ff0000; font-family: monospace; }
+        .btn-iniciar { width: 220px; height: 65px; background: #ff0000; border: none; color: #fff; border-radius: 50px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 40px; box-shadow: 0 0 20px red; }
+
+        /* TELA DE PRINT (IDÊNTICA À SUA FOTO) */
         #telaPrint {
             position: fixed; inset: 0; background: #000; display: none;
             flex-direction: column; justify-content: center; align-items: center; z-index: 5000;
         }
-        .linha-verde { width: 100%; height: 2px; background: #00ffcc; margin: 20px 0; box-shadow: 0 0 10px #00ffcc; }
-        .saque-texto { color: #00ffcc; letter-spacing: 5px; font-weight: bold; font-size: 18px; }
-        .valor-m { font-size: 100px; font-weight: 900; color: #00ffcc; margin: 10px 0; }
-        .obs-print { color: #ff0000; font-weight: bold; margin-top: 20px; }
+        .linha-verde { width: 100%; height: 2px; background: #00ffcc; box-shadow: 0 0 15px #00ffcc; margin: 40px 0; }
+        .texto-aprovado { color: #00ffcc; letter-spacing: 6px; font-weight: bold; font-size: 20px; text-shadow: 0 0 10px #00ffcc; }
+        .valor-final { font-size: 110px; font-weight: 900; color: #00ffcc; margin: 15px 0; text-shadow: 0 0 20px #00ffcc; }
+        .texto-print { color: #ff0000; font-weight: bold; margin-top: 30px; font-size: 18px; text-transform: uppercase; }
 
-        .btn-main { width: 250px; height: 60px; background: #ff0000; border: none; color: #fff; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 50px; }
+        /* BOTÃO VOLTAR ESCONDIDO NO PRINT */
+        .btn-reset { position: absolute; bottom: 20px; opacity: 0.1; background: none; border: none; color: white; }
     </style>
 </head>
 <body>
 
 <div id="telaLogin">
     <div class="login-box">
-        <h2 style="color:red">DEATH STORE</h2>
-        <p style="font-size: 10px; color: #444;">KEYS: 12345, 67890, ABCDE, DEATH1, PRO77</p>
-        <input type="text" id="keyInput" placeholder="DIGITE SUA KEY"> <br>
-        <button class="btn-main" onclick="validarKey()" style="margin-top:0;">ENTRAR</button>
+        <h1 style="color:red; margin-bottom:30px;">DEATH STORE</h1>
+        <input type="text" id="keyInput" placeholder="CHAVE DE ACESSO"> <br>
+        <button class="btn-iniciar" onclick="logar()">ENTRAR</button>
     </div>
 </div>
 
-<div class="header" id="headerUI">
-    <button class="btn-header-sacar" onclick="acionarSaque()">SACAR</button>
+<div class="topo-interface" id="header">
+    <button class="btn-sacar-topo" id="btnSacarReal" onclick="finalizarSaque()">SACAR</button>
     <div class="saldo-box">SALDO: 1.0M</div>
 </div>
 
-<div class="container" id="gameArea">
+<div class="game-container" id="gameArea">
     <div id="contador">1.00x</div>
-    <button class="btn-main" id="btnAcao" onclick="iniciar()">INICIAR</button>
+    <button class="btn-iniciar" id="btnPlay" onclick="rodarJogo()">INICIAR</button>
 </div>
 
 <div id="telaPrint">
     <div class="linha-verde"></div>
-    <div class="saque-texto">SAQUE APROVADO</div>
-    <div class="valor-m" id="valorFinal">1.12M</div>
-    <div style="color: #444; font-size: 12px;">TRANS-ID: TZB3RPP</div>
+    <div class="texto-aprovado">SAQUE APROVADO</div>
+    <div class="valor-final" id="vFinal">1.12M</div>
+    <div style="color: #555; font-size: 14px; font-family: monospace;">TRANS-ID: TZB3RPP</div>
     <div class="linha-verde"></div>
-    <div class="obs-print">📸 TIRE SEU PRINT AGORA</div>
-    <button onclick="voltar()" style="background:none; border:none; color:#222; margin-top:50px;">voltar</button>
+    <div class="texto-print">📸 TIRE SEU PRINT AGORA</div>
+    <button class="btn-reset" onclick="voltarAoJogo()">reiniciar</button>
 </div>
 
 <script>
     let mult = 1.00;
     let rodando = false;
-    let tentativas = 0;
+    let contagemSaques = 0;
     let timer = null;
-    const keysValidas = ["12345", "67890", "ABCDE", "DEATH1", "PRO77"];
 
-    function validarKey() {
-        const input = document.getElementById('keyInput').value;
-        if(keysValidas.includes(input)) {
+    // AS 5 KEYS QUE VOCÊ PEDIU
+    const keysValidas = ["ADMIN1", "DEATH2", "GOLD3", "STORE4", "VIP55"];
+
+    function logar() {
+        const pass = document.getElementById('keyInput').value;
+        if(keysValidas.includes(pass)) {
             document.getElementById('telaLogin').style.display = 'none';
             document.getElementById('gameArea').style.display = 'flex';
-            document.getElementById('headerUI').style.display = 'flex';
+            document.getElementById('header').style.display = 'flex';
         } else {
-            alert("KEY INVÁLIDA!");
+            alert("KEY INVÁLIDA! USE UMA DAS 5 KEYS.");
         }
     }
 
-    function iniciar() {
-        if(tentativas >= 3) {
-            alert("LIMITE DE TENTATIVAS ATINGIDO!");
+    function rodarJogo() {
+        if(contagemSaques >= 3) {
+            alert("SISTEMA TRAVADO: LIMITE DE 3 SAQUES ATINGIDO.");
             return;
         }
-        
+
         if(!rodando) {
             rodando = true;
             mult = 1.00;
-            document.getElementById('btnAcao').style.display = 'none';
+            document.getElementById('btnPlay').style.visibility = 'hidden';
             
             timer = setInterval(() => {
-                // Soma apenas nos decimais para manter o 1 fixo
-                mult += 0.03; 
-                // Se por acaso chegar a 2, força voltar pro 1 (segurança)
-                if(mult >= 1.99) { mult = 1.98; }
+                // Sobe de 0.04 em 0.04 mantendo o 1 fixo
+                mult += 0.04;
                 
+                // Trava para não passar de 1.99 (garante que comece com 1)
+                if(mult >= 1.99) mult = 1.98;
+
                 document.getElementById('contador').innerText = mult.toFixed(2) + "x";
-                
-                // Crash aleatório
-                if(Math.random() < 0.01 && mult > 1.10) { crash(); }
-            }, 100);
+            }, 80);
         }
     }
 
-    function acionarSaque() {
+    function finalizarSaque() {
         if(!rodando) return;
         
         clearInterval(timer);
         rodando = false;
-        tentativas++;
-        
-        // Formata o valor final para o print sempre começando com 1
-        document.getElementById('valorFinal').innerText = mult.toFixed(2) + "M";
+        contagemSaques++;
+
+        // Joga o valor pro print (Ex: 1.45M)
+        document.getElementById('vFinal').innerText = mult.toFixed(2) + "M";
         document.getElementById('telaPrint').style.display = 'flex';
     }
 
-    function crash() {
-        clearInterval(timer);
-        rodando = false;
-        document.getElementById('contador').innerText = "💥";
-        setTimeout(() => {
-            document.getElementById('btnAcao').style.display = 'block';
-            document.getElementById('contador').innerText = "1.00x";
-        }, 2000);
-    }
-
-    function voltar() {
+    function voltarAoJogo() {
         document.getElementById('telaPrint').style.display = 'none';
-        document.getElementById('btnAcao').style.display = 'block';
+        document.getElementById('btnPlay').style.visibility = 'visible';
         document.getElementById('contador').innerText = "1.00x";
     }
 </script>
