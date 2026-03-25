@@ -10,14 +10,7 @@ body {
   margin: 0;
   font-family: Arial;
   color: white;
-  background: linear-gradient(-45deg, #0a0000, #1a0000, #000, #220000);
-  background-size: 400% 400%;
-  animation: bg 8s infinite alternate;
-}
-
-@keyframes bg {
-  0% {background-position: left;}
-  100% {background-position: right;}
+  background: radial-gradient(circle at top, #1a0000, #000);
 }
 
 .topo {
@@ -36,32 +29,71 @@ body {
   flex-direction: column;
 }
 
-.login-box {
+.login-box, .box {
   background: #111;
   padding: 20px;
   border-radius: 15px;
-  box-shadow: 0 0 20px red;
+  box-shadow: 0 0 25px red;
+  text-align: center;
 }
 
 .game-area {
-  width: 300px;
-  height: 350px;
+  width: 320px;
+  height: 380px;
   border: 2px solid red;
   border-radius: 20px;
   position: relative;
   overflow: hidden;
   margin-top: 20px;
+  background: radial-gradient(circle, #000, #200000);
 }
 
+/* 🎈 BALÃO PROFISSIONAL */
 #balao {
   position: absolute;
   bottom: 0px;
   left: 50%;
   transform: translateX(-50%) scale(1);
-  width: 80px;
-  height: 100px;
-  background: radial-gradient(circle, red, darkred);
+  width: 100px;
+  height: 120px;
   border-radius: 50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  font-size:11px;
+  font-weight:bold;
+  color:white;
+
+  background:
+    radial-gradient(circle at 30% 30%, #ff4d4d, #990000),
+    repeating-radial-gradient(circle, rgba(255,255,255,0.08) 0px, transparent 3px);
+
+  box-shadow:
+    inset -10px -20px 40px rgba(0,0,0,0.8),
+    inset 10px 10px 20px rgba(255,255,255,0.2),
+    0 0 25px red;
+}
+
+#balao::before {
+  content:"";
+  position:absolute;
+  top:15px;
+  left:25px;
+  width:20px;
+  height:30px;
+  background:rgba(255,255,255,0.3);
+  border-radius:50%;
+  filter:blur(3px);
+}
+
+#balao::after {
+  content:"";
+  position:absolute;
+  width:140%;
+  height:140%;
+  background: radial-gradient(circle, rgba(255,0,0,0.2), transparent);
+  z-index:-1;
 }
 
 #multiFloat {
@@ -70,21 +102,23 @@ body {
   bottom: 120px;
   font-weight: bold;
   color: #00ffcc;
+  font-size: 18px;
 }
 
 button {
-  padding: 10px 20px;
+  padding: 12px 25px;
   border-radius: 10px;
   border: none;
   margin-top: 10px;
-  background: red;
-  color: white;
   cursor: pointer;
+  font-weight:bold;
+  font-size:16px;
 }
 
-.segurar { background: green; }
+.iniciar { background: #00aa00; color:white; }
+.parar { background: red; color:white; }
 
-#resgateTela {
+#resultadoTela {
   position: fixed;
   width: 100%;
   height: 100%;
@@ -92,14 +126,7 @@ button {
   display: none;
   justify-content: center;
   align-items: center;
-}
-
-.box {
-  background: #111;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 0 20px red;
-  text-align: center;
+  flex-direction:column;
 }
 </style>
 </head>
@@ -116,22 +143,23 @@ button {
 
 <div class="topo" id="topo">
   <span>💎 <span id="saldo">0</span></span>
-  <button onclick="resgatar()">SACAR</button>
 </div>
 
 <div class="container" id="game" style="display:none;">
   <div class="game-area">
-    <div id="balao"></div>
+    <div id="balao">DEATH<br>STORE</div>
     <div id="multiFloat">1.00x</div>
   </div>
-  <button id="btnSegurar" class="segurar">SEGURAR</button>
+  <button id="btnStart" class="iniciar">INICIAR</button>
+  <button id="btnStop" class="parar">PARAR</button>
 </div>
 
-<div id="resgateTela">
+<div id="resultadoTela">
   <div class="box">
-    <h2>RESGATE</h2>
+    <h2>SAQUE REALIZADO</h2>
     <h1 id="valor"></h1>
-    <button onclick="fechar()">Fechar</button>
+    <p>Tire print e envie</p>
+    <button onclick="fechar()">OK</button>
   </div>
 </div>
 
@@ -140,123 +168,86 @@ document.addEventListener("DOMContentLoaded", () => {
 
 let saldo = 1000000;
 let multi = 1;
-let intervalo = null;
+let intervalo;
 let jogando = false;
-let explodiu = false;
-let target = 1.5;
+let finalizado = false;
 
-const keys = {
-"KEY1":145372,"KEY2":172918,"KEY3":108564,"KEY4":180231,"KEY5":134982,
-"KEY6":119847,"KEY7":160553,"KEY8":125764,"KEY9":178345,"KEY10":142678,
-"KEY11":115999,"KEY12":155321,"KEY13":122456,"KEY14":167888,"KEY15":138777,
-"KEY16":110234,"KEY17":150999,"KEY18":128654,"KEY19":180000,"KEY20":136789
-};
+const keys = {"KEY1":1,"KEY2":1,"KEY3":1};
 
 const balao = document.getElementById("balao");
 const multiFloat = document.getElementById("multiFloat");
-const btnSegurar = document.getElementById("btnSegurar");
-const btnEntrar = document.getElementById("btnEntrar");
 
 function atualizar(){
   document.getElementById("saldo").innerText = saldo.toLocaleString();
 }
 
-btnEntrar.addEventListener("click", () => {
-  const key = document.getElementById("keyInput").value.trim();
-
+document.getElementById("btnEntrar").onclick = () => {
+  let key = document.getElementById("keyInput").value.trim();
   if(keys[key]){
-    let valor = keys[key].toString();
-    target = parseInt(valor.substring(0,3)) / 100 || 1.5;
-
     delete keys[key];
-
     document.getElementById("login").style.display="none";
     document.getElementById("game").style.display="flex";
     document.getElementById("topo").style.display="flex";
-
     atualizar();
   } else {
-    alert("Key inválida ou já usada");
+    alert("Key inválida");
   }
-});
+};
 
-btnSegurar.addEventListener("mousedown", iniciar);
-btnSegurar.addEventListener("mouseup", parar);
-btnSegurar.addEventListener("touchstart", iniciar);
-btnSegurar.addEventListener("touchend", parar);
-
-function iniciar(){
-  if(jogando) return;
+document.getElementById("btnStart").onclick = () => {
+  if(jogando || finalizado) return;
 
   jogando = true;
-  explodiu = false;
 
   intervalo = setInterval(()=>{
-    multi += 0.02;
+    multi += 0.03;
 
-    if(Math.random() < 0.01){
+    // risco crescente
+    if(Math.random() < multi * 0.01){
       explodir();
       return;
     }
 
-    if(multi >= target){
-      multi = target;
-      parar();
-    }
-
-    multiFloat.innerText = multi.toFixed(2) + "x";
+    multiFloat.innerText = multi.toFixed(2)+"x";
 
     let altura = parseInt(balao.style.bottom) || 0;
-    altura += 3;
+    altura += 4;
+    balao.style.bottom = altura+"px";
+    balao.style.transform = "translateX(-50%) scale("+multi+")";
 
-    balao.style.bottom = altura + "px";
-    multiFloat.style.bottom = (altura + 120) + "px";
-
-    balao.style.transform = "translateX(-50%) scale(" + multi + ")";
   },50);
-}
+};
 
-function parar(){
-  if(!jogando) return;
+document.getElementById("btnStop").onclick = () => {
+  if(!jogando || finalizado) return;
 
   clearInterval(intervalo);
+  jogando = false;
+  finalizado = true;
 
-  if(!explodiu){
-    saldo = Math.floor(saldo * multi);
-    alert("💎 Parou em " + multi.toFixed(2) + "x");
-  }
-
-  atualizar();
-  resetar();
-}
+  saldo = Math.floor(saldo * multi);
+  mostrar(saldo);
+};
 
 function explodir(){
-  explodiu = true;
   clearInterval(intervalo);
-  alert("💣 O balão explodiu!");
-  resetar();
-}
+  jogando = false;
+  finalizado = true;
 
-function resetar(){
-  setTimeout(() => {
-    multi = 1;
-    jogando = false;
-    explodiu = false;
-    balao.style.bottom = "0px";
-    balao.style.transform = "translateX(-50%) scale(1)";
-    multiFloat.innerText = "1.00x";
-  },1000);
-}
-
-window.resgatar = function(){
-  document.getElementById("valor").innerText = saldo.toLocaleString();
   saldo = 0;
+  mostrar(0);
+}
+
+function mostrar(valor){
+  document.getElementById("valor").innerText = "💎 "+Number(valor).toLocaleString();
+  document.getElementById("resultadoTela").style.display="flex";
   atualizar();
-  document.getElementById("resgateTela").style.display="flex";
 }
 
 window.fechar = function(){
-  document.getElementById("resgateTela").style.display="none";
+  document.getElementById("resultadoTela").style.display="none";
+  saldo = 0;
+  atualizar();
 }
 
 });
