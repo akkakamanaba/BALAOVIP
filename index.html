@@ -8,7 +8,7 @@
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background: #000 url('https://i.imgur.com/L0GqG6t.jpg') center top / cover no-repeat;
+  background: #000;
   color: white;
   overflow-x: hidden;
 }
@@ -19,7 +19,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 10px 20px;
-  background: rgba(0,0,0,0.85);
+  background: #000;
   border-bottom: 2px solid red;
 }
 
@@ -51,7 +51,6 @@ body {
   border-radius: 12px;
   cursor: pointer;
   font-weight: bold;
-  transition: all 0.3s;
   box-shadow: 0 0 20px red;
 }
 
@@ -60,11 +59,11 @@ body {
   box-shadow: 0 0 40px red;
 }
 
-/* GRÁFICO */
+/* BARRA */
 .bar-container {
   width: 100%;
   height: 20px;
-  background: #222;
+  background: #111;
   border-radius: 10px;
   margin-top: 10px;
   position: relative;
@@ -115,7 +114,6 @@ body {
   background: red;
   font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s;
   box-shadow: 0 0 15px red;
 }
 
@@ -133,7 +131,7 @@ body {
   position: relative;
   overflow: hidden;
   margin-top: 25px;
-  background: rgba(0,0,0,0.85);
+  background: #000;
 }
 
 #balao {
@@ -151,7 +149,6 @@ body {
   font-weight:bold;
   background: radial-gradient(circle at 30% 30%, #ff1a1a, #660000);
   box-shadow: 0 0 30px red;
-  transition: bottom 0.05s, transform 0.2s;
 }
 
 #multiFloat {
@@ -161,10 +158,9 @@ body {
   font-size: 26px;
   color: #ff4d4d;
   font-weight: bold;
-  text-shadow: 1px 1px 5px black;
 }
 
-/* BOTÃO SEGURAR */
+/* BOTÃO INICIAR */
 .segurar {
   margin-top: 20px;
   background: red;
@@ -173,14 +169,6 @@ body {
   cursor: pointer;
   font-weight: bold;
   font-size: 16px;
-  user-select: none;
-  transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0 0 15px red;
-}
-
-.segurar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 30px red;
 }
 
 /* RESULTADO SAQUE */
@@ -188,7 +176,7 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: #000000cc;
+  background: #000;
   display: none;
   justify-content: center;
   align-items: center;
@@ -224,8 +212,8 @@ body {
 </head>
 <body>
 
-<audio id="somExplosao" src="https://www.myinstants.com/media/sounds/explosion.mp3" preload="auto"></audio>
-<audio id="somConfete" src="https://www.myinstants.com/media/sounds/cheering-crowd.mp3" preload="auto"></audio>
+<audio id="somExplosao" src="https://www.myinstants.com/media/sounds/explosion.mp3"></audio>
+<audio id="somConfete" src="https://www.myinstants.com/media/sounds/cheering-crowd.mp3"></audio>
 
 <!-- LOGIN -->
 <div class="login" id="login">
@@ -251,10 +239,10 @@ body {
 <!-- JOGO -->
 <div class="container" id="game" style="display:none;">
   <div class="game-area">
-    <div id="balao">SEGURE</div>
+    <div id="balao">INICIAR</div>
     <div id="multiFloat">1.00x</div>
   </div>
-  <div class="segurar" id="btnSegurar">SEGURAR</div>
+  <div class="segurar" id="btnSegurar">INICIAR</div>
 </div>
 
 <!-- RESULTADO -->
@@ -289,12 +277,7 @@ const btnSacar = document.getElementById("btnSacar");
 const barFill = document.getElementById("barFill");
 const gameArea = document.querySelector('.game-area');
 
-const somExplosao = document.getElementById("somExplosao");
-const somConfete = document.getElementById("somConfete");
-
-function atualizar(){
-  document.getElementById("saldo").innerText = (saldo/1_000_000).toFixed(2) + "M";
-}
+function atualizar(){ document.getElementById("saldo").innerText = (saldo/1_000_000).toFixed(2) + "M"; }
 
 // LOGIN
 document.getElementById("btnEntrar").onclick = () => {
@@ -305,72 +288,37 @@ document.getElementById("btnEntrar").onclick = () => {
     document.getElementById("game").style.display="flex";
     document.getElementById("topo").style.display="flex";
     atualizar();
-    iniciarFakePlayers();
-  } else {
-    alert("Key inválida ou já usada");
-  }
+  } else { alert("Key inválida ou já usada"); }
 };
 
-btnSegurar.addEventListener("mousedown", iniciar);
-btnSegurar.addEventListener("touchstart", iniciar);
-btnSegurar.addEventListener("mouseup", parar);
-btnSegurar.addEventListener("mouseleave", parar);
-btnSegurar.addEventListener("touchend", parar);
-
-function iniciar(){
+// INICIAR BALÃO
+btnSegurar.onclick = () => {
   if(jogando || usado) return;
   usado = true;
   jogando = true;
   multi = 1;
   let tempo = 0;
+  const maxMulti = 1.8;
 
   intervalo = setInterval(()=>{
     tempo += 50;
-    let progresso = tempo/30000;
-    multi = 1 + (0.8*Math.pow(progresso,2));
-
-    if(multi > 1.8) multi = 1.8; // limite máximo
-
-    document.getElementById("saldo").innerText = (Math.floor(1_000_000*multi)/1_000_000).toFixed(2)+"M";
+    multi = 1 + 0.8 * Math.pow(tempo/30000,2);
+    if(multi > maxMulti) multi = maxMulti;
     multiFloat.innerText = multi.toFixed(2)+"x";
-    barFill.style.width = (multi/1.8*100)+"%";
-
-    let chance = 0.01 + (progresso *0.08);
-    if(Math.random()<chance || multi>=1.8){
-      explodir();
-      return;
-    }
-
-    if(multi >= 1.75){
-      somConfete.play();
-      criarConfete(20);
-    }
+    barFill.style.width = (multi/maxMulti*100)+"%";
+    document.getElementById("saldo").innerText = (Math.floor(1_000_000*multi)/1_000_000).toFixed(2)+"M";
 
     let altura = parseInt(balao.style.bottom)||0;
     altura += 4;
     balao.style.bottom = altura+"px";
+
+    if(multi>=maxMulti || Math.random()<0.01+(tempo/30000*0.08)){
+      clearInterval(intervalo);
+      jogando=false;
+      multiFloat.innerText="💥 PAROU";
+    }
   },50);
-}
-
-function parar(){ if(!jogando) return; clearInterval(intervalo); jogando=false; }
-
-function explodir(){ clearInterval(intervalo); jogando=false; multiFloat.innerText="💥 EXPLODIU"; somExplosao.play(); criarConfete(30); }
-
-function criarConfete(qtd){ for(let i=0;i<qtd;i++){ let c=document.createElement('div'); c.classList.add('confete'); c.style.left=Math.random()*gameArea.offsetWidth+'px'; gameArea.appendChild(c); setTimeout(()=>c.remove(),2000); } }
-
-// FAKE PLAYERS
-function iniciarFakePlayers(){
-  const bar = document.querySelector('.bar-container');
-  for(let i=0;i<5;i++){
-    let dot = document.createElement('div');
-    dot.classList.add('player-dot');
-    dot.style.left = Math.random()*bar.offsetWidth+"px";
-    bar.appendChild(dot);
-    setInterval(()=>{
-      dot.style.left = Math.random()*bar.offsetWidth+"px";
-    },1000);
-  }
-}
+};
 
 // SACAR
 btnSacar.onclick = () => {
@@ -379,7 +327,6 @@ btnSacar.onclick = () => {
   document.getElementById("valor").innerText = "💎 "+valorM;
   document.getElementById("codigo").innerText = "Código: "+codigo;
   document.getElementById("resultadoTela").style.display="flex";
-  atualizar();
 }
 </script>
 </body>
