@@ -3,160 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Death Store Pro - Edição Luxo</title>
+    <title>Death Store Pro</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #000; color: #fff; font-family: 'Arial Black', sans-serif; overflow: hidden; }
+        body { margin: 0; background: #000; color: #fff; font-family: 'Arial', sans-serif; overflow: hidden; }
 
-        /* HISTÓRICO NO TOPO */
-        .historico {
-            height: 50px; background: #050505; border-bottom: 2px solid #ff0000;
-            display: flex; align-items: center; overflow: hidden; white-space: nowrap; padding: 0 10px;
+        /* LOGIN */
+        #telaLogin { 
+            position: fixed; inset: 0; background: #000; z-index: 9999; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
         }
-        .h-item { color: #ff0000; font-size: 14px; margin-right: 15px; text-shadow: 0 0 5px #ff0000; opacity: 0.8; }
-
-        /* ÁREA DO JOGO */
-        .game-view { height: 75vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        .login-box { border: 1px solid #ff0000; padding: 40px; border-radius: 15px; text-align: center; background: #050505; }
+        input { padding: 15px; width: 250px; border-radius: 8px; border: 1px solid #ff0000; background: #000; color: #fff; margin-bottom: 20px; text-align: center; }
         
-        #contador { font-size: 100px; margin: 0; transition: color 0.3s; text-shadow: 0 0 30px rgba(255,0,0,0.3); }
-        .vitoria #contador { color: #00ffcc; text-shadow: 0 0 40px #00ffcc; }
-
-        /* BALÃO / ESFERA */
-        #balao {
-            position: absolute; width: 120px; height: 120px;
-            background: radial-gradient(circle at 30% 30%, #ff0000, #220000);
-            border-radius: 50%; box-shadow: 0 0 60px #ff0000;
-            bottom: -150px; display: none; z-index: -1;
+        /* HEADER COM SACAR E SALDO */
+        .header { 
+            display: none; justify-content: space-between; align-items: center; 
+            padding: 20px; position: fixed; top: 0; width: 100%; z-index: 100;
         }
+        .btn-header-sacar { background: #00ffcc; color: #000; padding: 10px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; }
+        .saldo-box { background: #111; border: 1px solid #00ffcc; padding: 10px 20px; border-radius: 5px; color: #00ffcc; font-weight: bold; }
 
-        /* BOTÃO MESTRE */
-        .footer-btn { height: 20vh; display: flex; justify-content: center; align-items: center; background: #080808; border-top: 1px solid #222; }
+        /* ÁREA CENTRAL */
+        .container { height: 100vh; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        #contador { font-size: 80px; font-weight: bold; color: #fff; text-shadow: 0 0 20px #ff0000; }
         
-        #btnAcao {
-            width: 85%; height: 85px; border: none; border-radius: 20px;
-            font-size: 24px; font-weight: 900; cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-transform: uppercase; letter-spacing: 2px;
-        }
-
-        /* ESTADOS DO BOTÃO */
-        .btn-iniciar { background: #ff0000; color: white; box-shadow: 0 8px 0 #800000; }
-        .btn-sacar { background: #fff; color: #000; box-shadow: 0 8px 0 #ccc; animation: pulse 1s infinite; }
-        .btn-confirmar { background: #00ffcc !important; color: #000 !important; box-shadow: 0 8px 0 #008f72 !important; }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 8px 0 #ccc, 0 0 0px #fff; }
-            50% { transform: scale(1.03); box-shadow: 0 8px 0 #ccc, 0 0 20px #fff; }
-            100% { transform: scale(1); box-shadow: 0 8px 0 #ccc, 0 0 0px #fff; }
-        }
-
-        /* TELA FINAL */
+        /* TELA DE PRINT (IGUAL À IMAGEM) */
         #telaPrint {
             position: fixed; inset: 0; background: #000; display: none;
-            flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
+            flex-direction: column; justify-content: center; align-items: center; z-index: 5000;
         }
-        .recibo { width: 85%; border: 3px solid #00ffcc; border-radius: 30px; padding: 40px; text-align: center; background: #050505; }
-        .recibo h1 { font-size: 60px; color: #00ffcc; margin: 15px 0; }
+        .linha-verde { width: 100%; height: 2px; background: #00ffcc; margin: 20px 0; box-shadow: 0 0 10px #00ffcc; }
+        .saque-texto { color: #00ffcc; letter-spacing: 5px; font-weight: bold; font-size: 18px; }
+        .valor-m { font-size: 100px; font-weight: 900; color: #00ffcc; margin: 10px 0; }
+        .obs-print { color: #ff0000; font-weight: bold; margin-top: 20px; }
+
+        .btn-main { width: 250px; height: 60px; background: #ff0000; border: none; color: #fff; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 50px; }
     </style>
 </head>
 <body>
 
-<div class="historico" id="hist"></div>
-
-<div class="game-view" id="gameArea">
-    <h1 id="contador">1.00x</h1>
-    <div id="balao"></div>
+<div id="telaLogin">
+    <div class="login-box">
+        <h2 style="color:red">DEATH STORE</h2>
+        <p style="font-size: 10px; color: #444;">KEYS: 12345, 67890, ABCDE, DEATH1, PRO77</p>
+        <input type="text" id="keyInput" placeholder="DIGITE SUA KEY"> <br>
+        <button class="btn-main" onclick="validarKey()" style="margin-top:0;">ENTRAR</button>
+    </div>
 </div>
 
-<div class="footer-btn">
-    <button id="btnAcao" class="btn-iniciar">INICIAR JOGO</button>
+<div class="header" id="headerUI">
+    <button class="btn-header-sacar" onclick="acionarSaque()">SACAR</button>
+    <div class="saldo-box">SALDO: 1.0M</div>
+</div>
+
+<div class="container" id="gameArea">
+    <div id="contador">1.00x</div>
+    <button class="btn-main" id="btnAcao" onclick="iniciar()">INICIAR</button>
 </div>
 
 <div id="telaPrint">
-    <div class="recibo">
-        <p style="color:#00ffcc; letter-spacing:3px;">SAQUE APROVADO</p>
-        <h1 id="vFinal">0.00M</h1>
-        <p id="idHash" style="font-family:monospace; color:#444; font-size:12px;"></p>
-        <button onclick="location.reload()" style="background:none; border:1px solid #222; color:#333; padding:10px; margin-top:20px; border-radius:10px;">FECHAR</button>
-    </div>
-    <h3 style="color:#ff0000; margin-top:30px;">📸 TIRE SEU PRINT AGORA</h3>
+    <div class="linha-verde"></div>
+    <div class="saque-texto">SAQUE APROVADO</div>
+    <div class="valor-m" id="valorFinal">1.12M</div>
+    <div style="color: #444; font-size: 12px;">TRANS-ID: TZB3RPP</div>
+    <div class="linha-verde"></div>
+    <div class="obs-print">📸 TIRE SEU PRINT AGORA</div>
+    <button onclick="voltar()" style="background:none; border:none; color:#222; margin-top:50px;">voltar</button>
 </div>
 
 <script>
     let mult = 1.00;
     let rodando = false;
+    let tentativas = 0;
     let timer = null;
-    let fase = "start"; // start, play, win
+    const keysValidas = ["12345", "67890", "ABCDE", "DEATH1", "PRO77"];
 
-    const btn = document.getElementById('btnAcao');
-    const display = document.getElementById('contador');
-    const balao = document.getElementById('balao');
-    const area = document.getElementById('gameArea');
-
-    // Histórico Fake Vermelho
-    for(let i=0; i<10; i++) {
-        document.getElementById('hist').innerHTML += `<span class="h-item">${(Math.random()*5+1).toFixed(2)}x</span>`;
-    }
-
-    btn.onclick = () => {
-        if (fase === "start") {
-            iniciar();
-        } else if (fase === "play") {
-            pararERetirar();
-        } else if (fase === "win") {
-            abrirRecibo();
+    function validarKey() {
+        const input = document.getElementById('keyInput').value;
+        if(keysValidas.includes(input)) {
+            document.getElementById('telaLogin').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'flex';
+            document.getElementById('headerUI').style.display = 'flex';
+        } else {
+            alert("KEY INVÁLIDA!");
         }
-    };
+    }
 
     function iniciar() {
-        fase = "play";
-        mult = 1.00;
-        area.classList.remove('vitoria');
-        btn.innerText = "SACAR AGORA";
-        btn.className = "btn-sacar";
-        balao.style.display = "block";
-        balao.style.bottom = "-150px";
-
-        timer = setInterval(() => {
-            mult += 0.04;
-            display.innerText = mult.toFixed(2) + "x";
+        if(tentativas >= 3) {
+            alert("LIMITE DE TENTATIVAS ATINGIDO!");
+            return;
+        }
+        
+        if(!rodando) {
+            rodando = true;
+            mult = 1.00;
+            document.getElementById('btnAcao').style.display = 'none';
             
-            // Sobe o balão
-            let pos = parseInt(balao.style.bottom) + 3;
-            balao.style.bottom = pos + "px";
-
-            if(Math.random() < 0.01 && mult > 2.0) { crash(); }
-        }, 80);
+            timer = setInterval(() => {
+                // Soma apenas nos decimais para manter o 1 fixo
+                mult += 0.03; 
+                // Se por acaso chegar a 2, força voltar pro 1 (segurança)
+                if(mult >= 1.99) { mult = 1.98; }
+                
+                document.getElementById('contador').innerText = mult.toFixed(2) + "x";
+                
+                // Crash aleatório
+                if(Math.random() < 0.01 && mult > 1.10) { crash(); }
+            }, 100);
+        }
     }
 
-    function pararERetirar() {
+    function acionarSaque() {
+        if(!rodando) return;
+        
         clearInterval(timer);
-        fase = "win";
+        rodando = false;
+        tentativas++;
         
-        // Efeito Visual de Sucesso
-        area.classList.add('vitoria');
-        btn.innerText = "GERAR COMPROVANTE";
-        btn.className = "btn-confirmar";
-        
-        // Vibração leve (se for no celular)
-        if(navigator.vibrate) navigator.vibrate(100);
-    }
-
-    function abrirRecibo() {
-        document.getElementById('vFinal').innerText = mult.toFixed(2) + "M";
-        document.getElementById('idHash').innerText = "TRANS-ID: " + Math.random().toString(36).toUpperCase().slice(2,10);
-        document.getElementById('telaPrint').style.display = "flex";
+        // Formata o valor final para o print sempre começando com 1
+        document.getElementById('valorFinal').innerText = mult.toFixed(2) + "M";
+        document.getElementById('telaPrint').style.display = 'flex';
     }
 
     function crash() {
         clearInterval(timer);
-        fase = "start";
-        display.innerText = "💥";
-        display.style.color = "red";
-        btn.innerText = "TENTAR NOVAMENTE";
-        btn.className = "btn-iniciar";
-        balao.style.display = "none";
-        setTimeout(() => { display.style.color = "white"; }, 1000);
+        rodando = false;
+        document.getElementById('contador').innerText = "💥";
+        setTimeout(() => {
+            document.getElementById('btnAcao').style.display = 'block';
+            document.getElementById('contador').innerText = "1.00x";
+        }, 2000);
+    }
+
+    function voltar() {
+        document.getElementById('telaPrint').style.display = 'none';
+        document.getElementById('btnAcao').style.display = 'block';
+        document.getElementById('contador').innerText = "1.00x";
     }
 </script>
 
