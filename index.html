@@ -17,7 +17,7 @@ body {
   display: none;
   justify-content: space-between;
   padding: 15px;
-  background: #000000cc;
+  background: #000;
   border-bottom: 2px solid red;
 }
 
@@ -48,7 +48,7 @@ body {
   background: radial-gradient(circle, #000, #200000);
 }
 
-/* 🎈 BALÃO PROFISSIONAL */
+/* BALÃO */
 #balao {
   position: absolute;
   bottom: 0px;
@@ -64,36 +64,8 @@ body {
   font-size:11px;
   font-weight:bold;
   color:white;
-
-  background:
-    radial-gradient(circle at 30% 30%, #ff4d4d, #990000),
-    repeating-radial-gradient(circle, rgba(255,255,255,0.08) 0px, transparent 3px);
-
-  box-shadow:
-    inset -10px -20px 40px rgba(0,0,0,0.8),
-    inset 10px 10px 20px rgba(255,255,255,0.2),
-    0 0 25px red;
-}
-
-#balao::before {
-  content:"";
-  position:absolute;
-  top:15px;
-  left:25px;
-  width:20px;
-  height:30px;
-  background:rgba(255,255,255,0.3);
-  border-radius:50%;
-  filter:blur(3px);
-}
-
-#balao::after {
-  content:"";
-  position:absolute;
-  width:140%;
-  height:140%;
-  background: radial-gradient(circle, rgba(255,0,0,0.2), transparent);
-  z-index:-1;
+  background: radial-gradient(circle at 30% 30%, #ff1a1a, #660000);
+  box-shadow: 0 0 25px red;
 }
 
 #multiFloat {
@@ -101,8 +73,8 @@ body {
   left: 60%;
   bottom: 120px;
   font-weight: bold;
-  color: #00ffcc;
-  font-size: 18px;
+  color: #ff4d4d;
+  font-size: 20px;
 }
 
 button {
@@ -112,11 +84,10 @@ button {
   margin-top: 10px;
   cursor: pointer;
   font-weight:bold;
-  font-size:16px;
 }
 
-.iniciar { background: #00aa00; color:white; }
-.parar { background: red; color:white; }
+.iniciar { background: red; color:white; }
+.parar { background: black; color:white; border:1px solid red; }
 
 #resultadoTela {
   position: fixed;
@@ -142,7 +113,7 @@ button {
 </div>
 
 <div class="topo" id="topo">
-  <span>💎 <span id="saldo">0</span></span>
+  💎 <span id="saldo">0</span>
 </div>
 
 <div class="container" id="game" style="display:none;">
@@ -151,22 +122,19 @@ button {
     <div id="multiFloat">1.00x</div>
   </div>
   <button id="btnStart" class="iniciar">INICIAR</button>
-  <button id="btnStop" class="parar">PARAR</button>
+  <button id="btnStop" class="parar">SACAR</button>
 </div>
 
 <div id="resultadoTela">
   <div class="box">
-    <h2>SAQUE REALIZADO</h2>
+    <h2>💰 SAQUE REALIZADO</h2>
     <h1 id="valor"></h1>
-    <p>Tire print e envie</p>
     <button onclick="fechar()">OK</button>
   </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-
-let saldo = 1000000;
+let saldo = 1000;
 let multi = 1;
 let intervalo;
 let jogando = false;
@@ -198,12 +166,19 @@ document.getElementById("btnStart").onclick = () => {
   if(jogando || finalizado) return;
 
   jogando = true;
+  multi = 1;
+  let tempo = 0;
 
   intervalo = setInterval(()=>{
-    multi += 0.03;
+    tempo += 50;
 
-    // risco crescente
-    if(Math.random() < multi * 0.01){
+    let progresso = tempo / 30000;
+
+    multi = 1 + (0.8 * Math.pow(progresso, 2));
+
+    let chance = 0.01 + (progresso * 0.08);
+
+    if(Math.random() < chance || multi >= 1.80){
       explodir();
       return;
     }
@@ -211,7 +186,7 @@ document.getElementById("btnStart").onclick = () => {
     multiFloat.innerText = multi.toFixed(2)+"x";
 
     let altura = parseInt(balao.style.bottom) || 0;
-    altura += 4;
+    altura += 2 + (progresso * 3);
     balao.style.bottom = altura+"px";
     balao.style.transform = "translateX(-50%) scale("+multi+")";
 
@@ -234,23 +209,31 @@ function explodir(){
   jogando = false;
   finalizado = true;
 
-  saldo = 0;
-  mostrar(0);
+  mostrar(saldo);
+}
+
+function gerarCodigo(){
+  return "DS-" + Math.floor(Math.random()*999999);
 }
 
 function mostrar(valor){
-  document.getElementById("valor").innerText = "💎 "+Number(valor).toLocaleString();
+  let codigo = gerarCodigo();
+
+  document.getElementById("valor").innerHTML = `
+  💎 ${Number(valor).toLocaleString()}<br><br>
+  🎉 PARABÉNS 🎉<br>
+  Código: <b>${codigo}</b><br><br>
+  Tire print e envie
+  `;
+
   document.getElementById("resultadoTela").style.display="flex";
   atualizar();
 }
 
-window.fechar = function(){
+function fechar(){
   document.getElementById("resultadoTela").style.display="none";
-  saldo = 0;
-  atualizar();
+  finalizado = false;
 }
-
-});
 </script>
 
 </body>
