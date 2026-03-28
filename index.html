@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MINES 13 - MSK & CANTE</title>
+    <title>DEATH STORE - MINES</title>
     <style>
         :root { --red: #ff0000; --black: #000000; --dark: #0f0f0f; --gray: #1a1a1a; --gold: #ffcc00; }
         body { background: var(--black); color: white; font-family: 'Impact', sans-serif; margin: 0; }
@@ -15,17 +15,12 @@
         #game-screen { display: none; width: 100%; max-width: 400px; }
         #login-screen { width: 100%; max-width: 350px; margin-top: 50px; text-align: center; }
 
-        .card { background: var(--dark); border: 2px solid var(--red); padding: 25px; border-radius: 20px; box-shadow: 0 0 30px var(--red); }
+        .card { background: var(--dark); border: 2px solid var(--red); padding: 25px; border-radius: 20px; box-shadow: 0 0 30px var(--red); margin-bottom: 20px; }
         input { width: 90%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--red); color: white; border-radius: 8px; text-align: center; font-size: 1rem; }
 
-        /* Grid Ajustado para 13 Quadrados */
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); /* 4 colunas para caber os 13 */
-            gap: 10px; 
-            margin: 20px 0; 
-        }
-        .tile { aspect-ratio: 1; background: var(--gray); border-radius: 12px; border: 2px solid #333; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 2rem; transition: 0.2s; }
+        /* Grade de 25 Slots (5x5) conforme a foto */
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 20px 0; }
+        .tile { aspect-ratio: 1; background: var(--gray); border-radius: 8px; border: 1px solid #333; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: 0.2s; }
         .tile.revealed { background: #000; cursor: default; border-color: var(--red); }
         .tile.gem { color: #00ff00; text-shadow: 0 0 15px #00ff00; }
         .tile.bomb { color: var(--red); text-shadow: 0 0 15px var(--red); }
@@ -42,7 +37,7 @@
 <body>
 
     <div class="header">
-        <div>MSK <span style="color:var(--red)">13-SLOTS</span></div>
+        <div><span style="color:var(--red)">DEATH</span> STORE</div>
         <div class="balance">SALDO: <span id="user-balance">0</span></div>
     </div>
 
@@ -57,8 +52,8 @@
 
         <div id="game-screen">
             <div class="card">
-                <label>MINAS (MAX 12):</label>
-                <input type="number" id="mine-select" value="1" min="1" max="12">
+                <label>MINAS (MAX 24):</label>
+                <input type="number" id="mine-select" value="4" min="1" max="24">
                 <label>APOSTA (MÍN 1M):</label>
                 <input type="number" id="bet-amount" value="1000000" min="1000000">
                 <button id="btn-start" class="btn-red" onclick="startGame()">JOGAR</button>
@@ -74,8 +69,9 @@
     <div id="modal-withdraw">
         <h2 style="color: #28a745;">SAQUE PRONTO!</h2>
         <p>Valor: <b id="final-value">0</b> Gemas</p>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=SAQUE_MSK" alt="QR">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=SAQUE_DEATH_STORE" alt="QR">
         <p>TICKET: <span id="ticket-code" style="font-weight:bold; color:var(--red)"></span></p>
+        <p style="font-size:0.8rem">Tire PRINT e mande para <b>Cante ou MSK King</b></p>
         <button class="btn-red" onclick="location.reload()">FECHAR</button>
     </div>
 
@@ -85,17 +81,17 @@
         let mines = [];
         let gameInProgress = false;
 
-        const validKeys = ["KEY33", "KEY22", "KEY278", "KEY4389", "KEY5U3", "KEY3096", "KEY937", "KEY830", "KEY9O3", "KEY1440", "KEY4311", "KEY1652", "KEY1653", "K45EY14", "KEY5415"];
+        const validKeys = ["KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"];
 
         function login() {
             const input = document.getElementById('key-input').value.trim().toUpperCase();
-            const usedKeys = JSON.parse(localStorage.getItem('used_keys_msk') || "[]");
+            const usedKeys = JSON.parse(localStorage.getItem('used_keys_death') || "[]");
 
-            if (usedKeys.includes(input)) { return alert("Key já usada!"); }
+            if (usedKeys.includes(input)) return alert("Key já usada!");
 
             if (validKeys.includes(input)) {
                 usedKeys.push(input);
-                localStorage.setItem('used_keys_msk', JSON.stringify(usedKeys));
+                localStorage.setItem('used_keys_death', JSON.stringify(usedKeys));
                 balance = 1000000;
                 updateBalance();
                 document.getElementById('login-screen').style.display = 'none';
@@ -108,24 +104,24 @@
             const numMines = parseInt(document.getElementById('mine-select').value);
 
             if (betValue > balance) return alert("Sem Saldo!");
-            if (numMines > 12) return alert("Máximo 12 minas!");
+            if (numMines < 1 || numMines > 24) return alert("Escolha entre 1 e 24 minas!");
 
             balance -= betValue;
             profit = 0;
             updateBalance();
             gameInProgress = true;
             document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-cashout').style.display = 'none';
             
-            // Gerar 13 slots
             const board = document.getElementById('board');
             board.innerHTML = '';
             mines = [];
             while(mines.length < numMines) {
-                let r = Math.floor(Math.random() * 13);
+                let r = Math.floor(Math.random() * 25);
                 if(!mines.includes(r)) mines.push(r);
             }
 
-            for(let i=0; i<13; i++) {
+            for(let i=0; i<25; i++) {
                 const tile = document.createElement('div');
                 tile.className = 'tile';
                 tile.onclick = () => {
@@ -134,15 +130,20 @@
                     if(mines.includes(i)) {
                         tile.innerHTML = '💣'; tile.classList.add('bomb');
                         gameInProgress = false;
-                        alert("PERDEU TUDO!");
-                        if(balance < 1000000) location.reload();
-                        else document.getElementById('btn-start').disabled = false;
+                        alert("BOOM! Você perdeu.");
+                        if(balance < 1000000) {
+                            alert("Saldo zerado! Use uma nova Key.");
+                            location.reload();
+                        } else {
+                            document.getElementById('btn-start').disabled = false;
+                        }
                     } else {
                         tile.innerHTML = '💎'; tile.classList.add('gem');
-                        let mult = numMines <= 10 ? numMines * 100000 : numMines * 1000000;
+                        // Lógica de prêmio: 1 mina = 100k, 10 minas = 1M, 20 minas = 2M por acerto
+                        let mult = numMines * 100000;
                         profit += mult;
                         document.getElementById('btn-cashout').style.display = 'block';
-                        document.getElementById('btn-cashout').innerText = `SACAR ${profit.toLocaleString()}`;
+                        document.getElementById('btn-cashout').innerText = `SACAR ${profit.toLocaleString()} GEMAS`;
                     }
                 };
                 board.appendChild(tile);
@@ -151,8 +152,9 @@
 
         function cashout() {
             balance += profit;
+            updateBalance();
             document.getElementById('final-value').innerText = profit.toLocaleString();
-            document.getElementById('ticket-code').innerText = "MSK-" + Math.floor(Math.random()*9999);
+            document.getElementById('ticket-code').innerText = "DS-" + Math.floor(Math.random()*99999);
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('modal-withdraw').style.display = 'block';
             gameInProgress = false;
