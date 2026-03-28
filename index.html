@@ -3,39 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MINES EXCLUSIVE - MSK & CANTE</title>
+    <title>MINES 13 - MSK & CANTE</title>
     <style>
         :root { --red: #ff0000; --black: #000000; --dark: #0f0f0f; --gray: #1a1a1a; --gold: #ffcc00; }
-        body { background: var(--black); color: white; font-family: 'Impact', sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: var(--black); color: white; font-family: 'Impact', sans-serif; margin: 0; }
         
-        /* Header com Saldo */
-        .header { width: 100%; background: var(--dark); padding: 15px; border-bottom: 3px solid var(--red); display: flex; justify-content: space-around; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 5px 15px rgba(255,0,0,0.2); }
+        .header { width: 100%; background: var(--dark); padding: 15px; border-bottom: 3px solid var(--red); display: flex; justify-content: space-around; align-items: center; position: sticky; top: 0; z-index: 100; }
         .balance { color: var(--gold); font-size: 1.4rem; text-shadow: 0 0 10px rgba(255,204,0,0.5); }
 
-        /* Telas */
         .container { display: flex; flex-direction: column; align-items: center; padding: 20px; }
         #game-screen { display: none; width: 100%; max-width: 400px; }
         #login-screen { width: 100%; max-width: 350px; margin-top: 50px; text-align: center; }
 
-        /* Login Card */
-        .card { background: var(--dark); border: 2px solid var(--red); padding: 30px; border-radius: 20px; box-shadow: 0 0 30px var(--red); }
-        input { width: 90%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid var(--red); color: white; border-radius: 8px; text-align: center; font-size: 1rem; }
+        .card { background: var(--dark); border: 2px solid var(--red); padding: 25px; border-radius: 20px; box-shadow: 0 0 30px var(--red); }
+        input { width: 90%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--red); color: white; border-radius: 8px; text-align: center; font-size: 1rem; }
 
-        /* Grid de Jogo */
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
-        .tile { aspect-ratio: 1; background: var(--gray); border-radius: 8px; border: 1px solid #333; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; transition: 0.2s; }
-        .tile.revealed { background: #000; cursor: default; }
+        /* Grid Ajustado para 13 Quadrados */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); /* 4 colunas para caber os 13 */
+            gap: 10px; 
+            margin: 20px 0; 
+        }
+        .tile { aspect-ratio: 1; background: var(--gray); border-radius: 12px; border: 2px solid #333; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 2rem; transition: 0.2s; }
+        .tile.revealed { background: #000; cursor: default; border-color: var(--red); }
         .tile.gem { color: #00ff00; text-shadow: 0 0 15px #00ff00; }
         .tile.bomb { color: var(--red); text-shadow: 0 0 15px var(--red); }
 
-        /* Botões Estilizados */
-        button { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 1.1rem; margin: 10px 0; transition: 0.3s; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 1.1rem; margin: 10px 0; }
         .btn-red { background: var(--red); color: white; }
-        .btn-red:hover { background: #b30000; transform: scale(1.02); }
         .btn-green { background: #28a745; color: white; display: none; }
-        .btn-red:disabled { background: #444; cursor: not-allowed; }
+        button:disabled { background: #444; cursor: not-allowed; }
 
-        /* Modal Saque */
         #modal-withdraw { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: black; padding: 25px; border-radius: 15px; text-align: center; z-index: 200; width: 80%; max-width: 320px; }
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 150; }
     </style>
@@ -43,191 +42,123 @@
 <body>
 
     <div class="header">
-        <div>MSK KING <span style="color:var(--red)">MINES</span></div>
+        <div>MSK <span style="color:var(--red)">13-SLOTS</span></div>
         <div class="balance">SALDO: <span id="user-balance">0</span></div>
     </div>
 
     <div class="container">
         <div id="login-screen">
             <div class="card">
-                <h2 style="color:var(--red)">ACESSO VIP</h2>
-                <p>Insira sua Key de 1.0M</p>
-                <input type="text" id="key-input" placeholder="DIGITE SUA KEY AQUI">
-                <button class="btn-red" onclick="login()">ATIVAR KEY</button>
-                <p style="font-size: 0.8rem; color: #666;">Cada key só pode ser usada 1 vez.</p>
+                <h2 style="color:var(--red)">LOGIN KEY</h2>
+                <input type="text" id="key-input" placeholder="COLE SUA KEY">
+                <button class="btn-red" onclick="login()">ATIVAR 1.0M</button>
             </div>
         </div>
 
         <div id="game-screen">
             <div class="card">
-                <div style="margin-bottom: 10px;">
-                    <label>MINAS (1-20):</label>
-                    <input type="number" id="mine-select" value="1" min="1" max="20" style="width: 50px; margin: 0;">
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <label>APOSTA:</label>
-                    <input type="number" id="bet-amount" value="1000000" min="1000000" style="width: 120px; margin: 0;">
-                </div>
-                <button id="btn-start" class="btn-red" onclick="startGame()">INICIAR APOSTA</button>
+                <label>MINAS (MAX 12):</label>
+                <input type="number" id="mine-select" value="1" min="1" max="12">
+                <label>APOSTA (MÍN 1M):</label>
+                <input type="number" id="bet-amount" value="1000000" min="1000000">
+                <button id="btn-start" class="btn-red" onclick="startGame()">JOGAR</button>
             </div>
 
             <div class="grid" id="board"></div>
 
-            <button id="btn-cashout" class="btn-green" onclick="cashout()">SACAR AGORA</button>
+            <button id="btn-cashout" class="btn-green" onclick="cashout()">SACAR</button>
         </div>
     </div>
 
     <div id="overlay"></div>
     <div id="modal-withdraw">
-        <h2 style="color: #28a745;">SAQUE SOLICITADO!</h2>
+        <h2 style="color: #28a745;">SAQUE PRONTO!</h2>
         <p>Valor: <b id="final-value">0</b> Gemas</p>
-        <div id="qr-area">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=SAQUE_MSK_KING" alt="QR">
-        </div>
-        <p>CÓDIGO: <br><span id="ticket-code" style="background:#eee; padding:5px; font-family:monospace;"></span></p>
-        <p style="font-size:0.8rem">Tire PRINT e mande para <b>Cante ou MSK King</b></p>
-        <button class="btn-red" onclick="location.reload()">CONCLUIR</button>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=SAQUE_MSK" alt="QR">
+        <p>TICKET: <span id="ticket-code" style="font-weight:bold; color:var(--red)"></span></p>
+        <button class="btn-red" onclick="location.reload()">FECHAR</button>
     </div>
 
     <script>
         let balance = 0;
-        let currentBet = 0;
         let profit = 0;
         let mines = [];
         let gameInProgress = false;
 
-        // --- SISTEMA DE KEYS ---
-        const validKeys = ["KEY-01", "KEY-02", "MSK-10", "KING-07", "CANTE-VIP", "ADMIN-99", "GEM-2024", "MINES-01", "MSK-GOLD", "VIP-ACCESS"];
+        const validKeys = ["KEY33", "KEY22", "KEY278", "KEY4389", "KEY5U3", "KEY3096", "KEY937", "KEY830", "KEY9O3", "KEY1440", "KEY4311", "KEY1652", "KEY1653", "K45EY14", "KEY5415"];
 
         function login() {
             const input = document.getElementById('key-input').value.trim().toUpperCase();
-            const usedKeys = JSON.parse(localStorage.getItem('used_keys') || "[]");
+            const usedKeys = JSON.parse(localStorage.getItem('used_keys_msk') || "[]");
 
-            if (usedKeys.includes(input)) {
-                alert("ERRO: Esta Key já foi utilizada neste dispositivo!");
-                return;
-            }
+            if (usedKeys.includes(input)) { return alert("Key já usada!"); }
 
             if (validKeys.includes(input)) {
-                // Invalida a key localmente
                 usedKeys.push(input);
-                localStorage.setItem('used_keys', JSON.stringify(usedKeys));
-                
-                // Injeta saldo de 1 Milhão
+                localStorage.setItem('used_keys_msk', JSON.stringify(usedKeys));
                 balance = 1000000;
                 updateBalance();
-                
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('game-screen').style.display = 'block';
-                alert("Key Ativada! +1,000,000 de saldo.");
-            } else {
-                alert("Key Inválida!");
-            }
-        }
-
-        // --- LÓGICA DE PREMIOS ---
-        function getMultiplier(numMines) {
-            const m = parseInt(numMines);
-            if (m <= 10) return m * 100000; // 1=100k, 2=200k... 10=1M
-            return m * 1000000; // 11=11M, 20=20M...
+            } else { alert("Key Inválida!"); }
         }
 
         function startGame() {
-            const betInput = document.getElementById('bet-amount');
-            const betValue = parseInt(betInput.value);
-            const numMines = document.getElementById('mine-select').value;
+            const betValue = parseInt(document.getElementById('bet-amount').value);
+            const numMines = parseInt(document.getElementById('mine-select').value);
 
-            if (betValue > balance) {
-                alert("Saldo Insuficiente!");
-                return;
-            }
-            if (betValue < 1000000) {
-                alert("Aposta mínima é 1,000,000!");
-                return;
-            }
+            if (betValue > balance) return alert("Sem Saldo!");
+            if (numMines > 12) return alert("Máximo 12 minas!");
 
             balance -= betValue;
-            currentBet = betValue;
             profit = 0;
             updateBalance();
-            
             gameInProgress = true;
             document.getElementById('btn-start').disabled = true;
-            document.getElementById('btn-cashout').style.display = 'none';
             
-            setupBoard(numMines);
-        }
-
-        function setupBoard(numMines) {
+            // Gerar 13 slots
             const board = document.getElementById('board');
             board.innerHTML = '';
             mines = [];
-            
             while(mines.length < numMines) {
-                let r = Math.floor(Math.random() * 25);
+                let r = Math.floor(Math.random() * 13);
                 if(!mines.includes(r)) mines.push(r);
             }
 
-            for(let i=0; i<25; i++) {
+            for(let i=0; i<13; i++) {
                 const tile = document.createElement('div');
                 tile.className = 'tile';
-                tile.onclick = () => clickTile(i, tile);
+                tile.onclick = () => {
+                    if(!gameInProgress || tile.classList.contains('revealed')) return;
+                    tile.classList.add('revealed');
+                    if(mines.includes(i)) {
+                        tile.innerHTML = '💣'; tile.classList.add('bomb');
+                        gameInProgress = false;
+                        alert("PERDEU TUDO!");
+                        if(balance < 1000000) location.reload();
+                        else document.getElementById('btn-start').disabled = false;
+                    } else {
+                        tile.innerHTML = '💎'; tile.classList.add('gem');
+                        let mult = numMines <= 10 ? numMines * 100000 : numMines * 1000000;
+                        profit += mult;
+                        document.getElementById('btn-cashout').style.display = 'block';
+                        document.getElementById('btn-cashout').innerText = `SACAR ${profit.toLocaleString()}`;
+                    }
+                };
                 board.appendChild(tile);
             }
         }
 
-        function clickTile(idx, el) {
-            if(!gameInProgress || el.classList.contains('revealed')) return;
-
-            el.classList.add('revealed');
-            if(mines.includes(idx)) {
-                el.innerHTML = '💣';
-                el.classList.add('bomb');
-                gameOver(false);
-            } else {
-                el.innerHTML = '💎';
-                el.classList.add('gem');
-                
-                const m = document.getElementById('mine-select').value;
-                profit += getMultiplier(m);
-                
-                document.getElementById('btn-cashout').style.display = 'block';
-                document.getElementById('btn-cashout').innerText = `SACAR ${profit.toLocaleString()} GEMAS`;
-            }
-        }
-
         function cashout() {
-            if(!gameInProgress) return;
             balance += profit;
-            updateBalance();
-            
             document.getElementById('final-value').innerText = profit.toLocaleString();
-            document.getElementById('ticket-code').innerText = "TK-" + Math.floor(Math.random()*999999);
+            document.getElementById('ticket-code').innerText = "MSK-" + Math.floor(Math.random()*9999);
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('modal-withdraw').style.display = 'block';
-            
             gameInProgress = false;
         }
 
-        function gameOver(win) {
-            gameInProgress = false;
-            if(!win) {
-                alert("BOOM! Você perdeu tudo desta rodada.");
-                setTimeout(() => {
-                    if(balance < 1000000) {
-                        alert("Saldo insuficiente para continuar. Use uma nova Key!");
-                        location.reload();
-                    } else {
-                        document.getElementById('btn-start').disabled = false;
-                        document.getElementById('board').innerHTML = '';
-                    }
-                }, 1000);
-            }
-        }
-
-        function updateBalance() {
-            document.getElementById('user-balance').innerText = balance.toLocaleString();
-        }
+        function updateBalance() { document.getElementById('user-balance').innerText = balance.toLocaleString(); }
     </script>
 </body>
 </html>
