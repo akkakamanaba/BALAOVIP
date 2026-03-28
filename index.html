@@ -3,524 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mines Gemas - MSK King</title>
+    <title>MINES EXCLUSIVE - MSK & CANTE</title>
     <style>
-        /* --- ESTILOS VISUAIS (CSS) --- */
-        :root {
-            --primary: #ff0000;    /* Vermelho Vibrante */
-            --primary-hover: #cc0000; /* Vermelho Mais Escuro para Hover */
-            --bg: #0a0a0a;         /* Preto Profundo */
-            --card: #1a1a1a;       /* Cinza Escuro para Elementos */
-            --text: #ffffff;       /* Texto Branco */
-            --border: #444;        /* Cor das Bordas */
-            --success: #28a745;    /* Verde para Botão de Saque */
-        }
+        :root { --red: #ff0000; --black: #000000; --dark: #0f0f0f; --gray: #1a1a1a; --gold: #ffcc00; }
+        body { background: var(--black); color: white; font-family: 'Impact', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        /* Header com Saldo */
+        .header { width: 100%; background: var(--dark); padding: 15px; border-bottom: 3px solid var(--red); display: flex; justify-content: space-around; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 5px 15px rgba(255,0,0,0.2); }
+        .balance { color: var(--gold); font-size: 1.4rem; text-shadow: 0 0 10px rgba(255,204,0,0.5); }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
+        /* Telas */
+        .container { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        #game-screen { display: none; width: 100%; max-width: 400px; }
+        #login-screen { width: 100%; max-width: 350px; margin-top: 50px; text-align: center; }
 
-        /* --- TELA DE ACESSO --- */
-        #login-screen {
-            background: var(--card);
-            padding: 40px;
-            border-radius: 20px;
-            border: 3px solid var(--primary);
-            text-align: center;
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
-            width: 90%;
-            max-width: 400px;
-        }
+        /* Login Card */
+        .card { background: var(--dark); border: 2px solid var(--red); padding: 30px; border-radius: 20px; box-shadow: 0 0 30px var(--red); }
+        input { width: 90%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid var(--red); color: white; border-radius: 8px; text-align: center; font-size: 1rem; }
 
-        #login-screen h1 {
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-        }
+        /* Grid de Jogo */
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+        .tile { aspect-ratio: 1; background: var(--gray); border-radius: 8px; border: 1px solid #333; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; transition: 0.2s; }
+        .tile.revealed { background: #000; cursor: default; }
+        .tile.gem { color: #00ff00; text-shadow: 0 0 15px #00ff00; }
+        .tile.bomb { color: var(--red); text-shadow: 0 0 15px var(--red); }
 
-        #key-input {
-            padding: 15px;
-            width: 80%;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            background-color: #2a2a2a;
-            color: var(--text);
-            font-size: 16px;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
-        }
+        /* Botões Estilizados */
+        button { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 1.1rem; margin: 10px 0; transition: 0.3s; }
+        .btn-red { background: var(--red); color: white; }
+        .btn-red:hover { background: #b30000; transform: scale(1.02); }
+        .btn-green { background: #28a745; color: white; display: none; }
+        .btn-red:disabled { background: #444; cursor: not-allowed; }
 
-        #key-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* --- TELA DO JOGO (GAME CONTAINER) --- */
-        #game-container {
-            display: none; /* Escondido por padrão */
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        /* Painel de Controles */
-        .controls {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
-        }
-
-        .status {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .mine-selector {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        #mine-count {
-            width: 60px;
-            padding: 10px;
-            background: #2a2a2a;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 1.1em;
-            text-align: center;
-        }
-
-        /* Grade do Jogo */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .tile {
-            width: 100%;
-            aspect-ratio: 1; /* Mantém o tile quadrado */
-            background: #2a2a2a;
-            border-radius: 10px;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em;
-            transition: background-color 0.3s, transform 0.1s;
-        }
-
-        .tile:hover:not(.revealed):not(.game-over) {
-            background: #3a3a3a;
-        }
-
-        .tile:active {
-            transform: scale(0.95);
-        }
-
-        /* Estilos dos Tiles Revelados */
-        .tile.revealed {
-            background: #333;
-            cursor: default;
-            border-color: #555;
-        }
-
-        .tile.gem {
-            color: #00ff00; /* Verde para Gemas */
-            text-shadow: 0 0 8px #00ff00;
-        }
-
-        .tile.bomb {
-            color: var(--primary); /* Vermelho para Bombas */
-            animation: shake 0.5s; /* Animação de tremor */
-        }
-
-        /* --- BOTÕES --- */
-        button {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1.1em;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: background-color 0.3s, transform 0.1s;
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .btn-play {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-play:hover {
-            background: var(--primary-hover);
-        }
-
-        .btn-play:disabled {
-            background: #666;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .btn-cashout {
-            background: var(--success);
-            color: white;
-            display: none; /* Escondido por padrão, aparece durante a rodada */
-        }
-
-        .btn-cashout:hover {
-            background: #218838;
-        }
-
-        /* --- MODAL DE SAQUE --- */
-        #withdraw-modal {
-            display: none; /* Escondido por padrão */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white; /* Fundo branco para QR Code */
-            color: black;
-            padding: 30px;
-            text-align: center;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            width: 80%;
-            max-width: 350px;
-        }
-
-        #withdraw-modal h3 {
-            margin-top: 0;
-            color: #333;
-        }
-
-        #qrcode {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        #secure-code {
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-weight: bold;
-            font-size: 1.2em;
-            display: block;
-            word-wrap: break-word;
-        }
-
-        .withdraw-instructions {
-            font-size: 0.9em;
-            line-height: 1.4;
-            color: #555;
-            margin-top: 15px;
-        }
-
-        /* Overlay para o modal */
-        #overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 99;
-        }
-
-        /* Animação de tremor para a bomba */
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
+        /* Modal Saque */
+        #modal-withdraw { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: black; padding: 25px; border-radius: 15px; text-align: center; z-index: 200; width: 80%; max-width: 320px; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 150; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <h1>Mines Access</h1>
-        <p style="color: #aaa; margin-bottom: 20px;">Digite sua Key única para acessar o jogo.</p>
-        <input type="text" id="key-input" placeholder="Digite sua Key Única">
-        <button class="btn-play" onclick="validateKey()">Entrar</button>
+    <div class="header">
+        <div>MSK KING <span style="color:var(--red)">MINES</span></div>
+        <div class="balance">SALDO: <span id="user-balance">0</span></div>
     </div>
 
-    <div id="game-container">
-        <div class="controls">
-            <div class="status">Gemas: <span id="gem-count" style="color: #00ff00;">0</span></div>
-            <div class="mine-selector">
-                <label for="mine-count">Minas:</label>
-                <input type="number" id="mine-count" value="4" min="1" max="24">
+    <div class="container">
+        <div id="login-screen">
+            <div class="card">
+                <h2 style="color:var(--red)">ACESSO VIP</h2>
+                <p>Insira sua Key de 1.0M</p>
+                <input type="text" id="key-input" placeholder="DIGITE SUA KEY AQUI">
+                <button class="btn-red" onclick="login()">ATIVAR KEY</button>
+                <p style="font-size: 0.8rem; color: #666;">Cada key só pode ser usada 1 vez.</p>
             </div>
-            <p style="font-size: 0.9em; color: #aaa; margin-bottom: 15px;">Quanto mais minas, maior o prêmio por gema.</p>
-            <button class="btn-play" id="start-btn" onclick="startGame()">Começar Rodada</button>
-            <button class="btn-cashout" id="cashout-btn" onclick="showWithdraw()">Resgatar Gemas (<span id="cashout-value"></span>)</button>
         </div>
 
-        <div class="grid" id="grid">
+        <div id="game-screen">
+            <div class="card">
+                <div style="margin-bottom: 10px;">
+                    <label>MINAS (1-20):</label>
+                    <input type="number" id="mine-select" value="1" min="1" max="20" style="width: 50px; margin: 0;">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label>APOSTA:</label>
+                    <input type="number" id="bet-amount" value="1000000" min="1000000" style="width: 120px; margin: 0;">
+                </div>
+                <button id="btn-start" class="btn-red" onclick="startGame()">INICIAR APOSTA</button>
             </div>
+
+            <div class="grid" id="board"></div>
+
+            <button id="btn-cashout" class="btn-green" onclick="cashout()">SACAR AGORA</button>
+        </div>
     </div>
 
     <div id="overlay"></div>
-    <div id="withdraw-modal">
-        <h3>Resgate de Gemas</h3>
-        <p>Gemas a receber:</p>
-        <div class="status" style="color: #008000; font-size: 1.5em; margin: 10px 0;">
-            <span id="final-gem-count">0</span>
+    <div id="modal-withdraw">
+        <h2 style="color: #28a745;">SAQUE SOLICITADO!</h2>
+        <p>Valor: <b id="final-value">0</b> Gemas</p>
+        <div id="qr-area">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=SAQUE_MSK_KING" alt="QR">
         </div>
-        <div id="qrcode">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=MSK_KING_RESGATE" alt="QR Code de Resgate">
-        </div>
-        <p>Código de Segurança Único:</p>
-        <strong id="secure-code"></strong>
-        <div class="withdraw-instructions">
-            <strong>Instruções:</strong>
-            <p>1. Tire um print completo desta tela.</p>
-            <p>2. Envie o print para <b>Cante ou MSK King</b>.</p>
-            <p>3. Aguarde o envio das suas gemas.</p>
-        </div>
-        <button onclick="closeWithdrawAndReset()">Fechar e Resetar Jogo</button>
+        <p>CÓDIGO: <br><span id="ticket-code" style="background:#eee; padding:5px; font-family:monospace;"></span></p>
+        <p style="font-size:0.8rem">Tire PRINT e mande para <b>Cante ou MSK King</b></p>
+        <button class="btn-red" onclick="location.reload()">CONCLUIR</button>
     </div>
 
     <script>
-        // --- LÓGICA DO JOGO (JAVASCRIPT) ---
+        let balance = 0;
+        let currentBet = 0;
+        let profit = 0;
+        let mines = [];
+        let gameInProgress = false;
 
-        // Configurações e Variáveis de Estado
-        // ADICIONE SUAS 15 KEYS ÚNICAS AQUI NA LISTA
-        const validKeys = [
-            "KEY-045", "KEY-023", "KEY-034", "KEY-034", "KEY-093",
-            "KEY-060", "KEY-022", "KEY-008", "KEY-023", "KEY-015",
-            "KEY-011", "KEY-043", "KEY-013", "KEY-098", "MSK-KING-777"
-        ];
+        // --- SISTEMA DE KEYS ---
+        const validKeys = ["KEY-01", "KEY-02", "MSK-10", "KING-07", "CANTE-VIP", "ADMIN-99", "GEM-2024", "MINES-01", "MSK-GOLD", "VIP-ACCESS"];
 
-        let currentGems = 0;
-        let minesLocations = [];
-        let gameActive = false;
-        let tilesRevealedCount = 0;
+        function login() {
+            const input = document.getElementById('key-input').value.trim().toUpperCase();
+            const usedKeys = JSON.parse(localStorage.getItem('used_keys') || "[]");
 
-        const tileValues = {
-            1: 100000,   // 1 mina = 100k gemas por acerto
-            3: 300000,   // 3 minas = 300k gemas por acerto
-            4: 1000000,  // 4 minas = 1M gemas por acerto (padrão)
-            10: 2500000, // 10 minas = 2.5M gemas por acerto
-            20: 10000000 // 20 minas = 10M gemas por acerto
-            // Você pode adicionar outras regras se quiser
-        };
-
-        // --- SISTEMA DE KEYS (SIMULADO) ---
-        function validateKey() {
-            const inputElement = document.getElementById('key-input');
-            const key = inputElement.value.trim().toUpperCase(); // Normaliza a key
-
-            if (validKeys.includes(key)) {
-                // No mundo real, você enviaria a key para o backend para deletá-la do banco de dados.
-                // Como este é um protótipo estático, apenas autorizamos o acesso.
-                alert("Acesso Autorizado! Key Validada.");
-                inputElement.value = ''; // Limpa o input
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('game-container').style.display = 'block';
-            } else {
-                alert("Key inválida ou já utilizada! Entre em contato com o administrador.");
-                inputElement.value = ''; // Limpa o input
-            }
-        }
-
-        // --- FUNÇÕES DO JOGO ---
-
-        // Inicia uma nova rodada
-        function startGame() {
-            const mineCountInput = document.getElementById('mine-count');
-            const mineCount = parseInt(mineCountInput.value);
-
-            // Validação simples do número de minas
-            if (isNaN(mineCount) || mineCount < 1 || mineCount > 24) {
-                alert("Por favor, escolha entre 1 e 24 minas.");
+            if (usedKeys.includes(input)) {
+                alert("ERRO: Esta Key já foi utilizada neste dispositivo!");
                 return;
             }
 
-            // Resetar o estado da rodada
-            minesLocations = [];
-            currentGems = 0;
-            tilesRevealedCount = 0;
-            gameActive = true;
-            document.getElementById('gem-count').innerText = "0";
-            document.getElementById('grid').innerHTML = ''; // Limpa a grade
-            document.getElementById('cashout-btn').style.display = 'none'; // Esconde botão de saque
-            
-            // Gerenciar estado dos controles
-            document.getElementById('start-btn').disabled = true;
-            mineCountInput.disabled = true;
+            if (validKeys.includes(input)) {
+                // Invalida a key localmente
+                usedKeys.push(input);
+                localStorage.setItem('used_keys', JSON.stringify(usedKeys));
+                
+                // Injeta saldo de 1 Milhão
+                balance = 1000000;
+                updateBalance();
+                
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('game-screen').style.display = 'block';
+                alert("Key Ativada! +1,000,000 de saldo.");
+            } else {
+                alert("Key Inválida!");
+            }
+        }
 
-            // Gerar localizações das minas aleatoriamente
-            while(minesLocations.length < mineCount) {
-                let randomPosition = Math.floor(Math.random() * 25); // Posição de 0 a 24
-                if(!minesLocations.includes(randomPosition)) {
-                    minesLocations.push(randomPosition);
-                }
+        // --- LÓGICA DE PREMIOS ---
+        function getMultiplier(numMines) {
+            const m = parseInt(numMines);
+            if (m <= 10) return m * 100000; // 1=100k, 2=200k... 10=1M
+            return m * 1000000; // 11=11M, 20=20M...
+        }
+
+        function startGame() {
+            const betInput = document.getElementById('bet-amount');
+            const betValue = parseInt(betInput.value);
+            const numMines = document.getElementById('mine-select').value;
+
+            if (betValue > balance) {
+                alert("Saldo Insuficiente!");
+                return;
+            }
+            if (betValue < 1000000) {
+                alert("Aposta mínima é 1,000,000!");
+                return;
             }
 
-            // Gerar a grade de 25 tiles
+            balance -= betValue;
+            currentBet = betValue;
+            profit = 0;
+            updateBalance();
+            
+            gameInProgress = true;
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-cashout').style.display = 'none';
+            
+            setupBoard(numMines);
+        }
+
+        function setupBoard(numMines) {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            mines = [];
+            
+            while(mines.length < numMines) {
+                let r = Math.floor(Math.random() * 25);
+                if(!mines.includes(r)) mines.push(r);
+            }
+
             for(let i=0; i<25; i++) {
                 const tile = document.createElement('div');
                 tile.className = 'tile';
-                tile.onclick = () => revealTile(i, tile); // Atribui a função de clique
-                document.getElementById('grid').appendChild(tile);
+                tile.onclick = () => clickTile(i, tile);
+                board.appendChild(tile);
             }
         }
 
-        // Função chamada ao clicar em um tile
-        function revealTile(index, element) {
-            // Se o jogo não estiver ativo ou o tile já foi revelado, não faz nada
-            if(!gameActive || element.classList.contains('revealed')) return;
+        function clickTile(idx, el) {
+            if(!gameInProgress || el.classList.contains('revealed')) return;
 
-            element.classList.add('revealed');
-            
-            if(minesLocations.includes(index)) {
-                // O jogador clicou em uma bomba
-                element.innerHTML = '💣';
-                element.classList.add('bomb');
-                gameOver(false); // Perdeu o jogo
+            el.classList.add('revealed');
+            if(mines.includes(idx)) {
+                el.innerHTML = '💣';
+                el.classList.add('bomb');
+                gameOver(false);
             } else {
-                // O jogador clicou em uma gema
-                element.innerHTML = '💎';
-                element.classList.add('gem');
+                el.innerHTML = '💎';
+                el.classList.add('gem');
                 
-                // Calcula o valor da gema baseado no número de minas
-                const mineCount = parseInt(document.getElementById('mine-count').value);
-                const valuePerGem = tileValues[mineCount] || (mineCount * 100000); // Valor padrão se não estiver na tabela
-
-                currentGems += valuePerGem;
-                tilesRevealedCount++;
+                const m = document.getElementById('mine-select').value;
+                profit += getMultiplier(m);
                 
-                // Atualiza o display de gemas
-                document.getElementById('gem-count').innerText = currentGems.toLocaleString();
-                
-                // Mostra o botão de saque e atualiza o valor
-                const cashoutBtn = document.getElementById('cashout-btn');
-                const cashoutValueSpan = document.getElementById('cashout-value');
-                cashoutBtn.style.display = 'block';
-                cashoutValueSpan.innerText = currentGems.toLocaleString() + " Gemas";
-
-                // Se o jogador revelou todos os tiles sem bombas (vitória perfeita)
-                if (tilesRevealedCount === (25 - minesLocations.length)) {
-                    gameOver(true); // Ganhou o jogo
-                }
+                document.getElementById('btn-cashout').style.display = 'block';
+                document.getElementById('btn-cashout').innerText = `SACAR ${profit.toLocaleString()} GEMAS`;
             }
         }
 
-        // Finaliza o jogo (vitória ou derrota)
-        function gameOver(win) {
-            gameActive = false; // Bloqueia novos cliques
+        function cashout() {
+            if(!gameInProgress) return;
+            balance += profit;
+            updateBalance();
             
-            // Reabilita os controles
-            document.getElementById('start-btn').disabled = false;
-            document.getElementById('mine-count').disabled = false;
-            document.getElementById('cashout-btn').style.display = 'none'; // Esconde botão de saque
-
-            if (win) {
-                alert(`Parabéns! Você ganhou ${currentGems.toLocaleString()} Gemas! Clique em Resgatar para solicitar.`);
-                // Mostra o botão de saque novamente para o jogador sacar
-                document.getElementById('cashout-btn').style.display = 'block';
-                // Impede que o jogador continue jogando
-                gameActive = false; 
-                document.getElementById('start-btn').disabled = true;
-                // Adiciona uma classe para indicar que o jogo acabou nos tiles
-                document.querySelectorAll('.tile').forEach(tile => tile.classList.add('game-over'));
-            } else {
-                // Mostra onde estavam todas as bombas
-                minesLocations.forEach(mineIndex => {
-                    const tile = document.getElementById('grid').children[mineIndex];
-                    if (!tile.classList.contains('bomb')) {
-                        tile.innerHTML = '💣';
-                        tile.classList.add('revealed');
-                        tile.classList.add('bomb');
-                        tile.style.opacity = '0.7'; // Bombas não clicadas ficam mais transparentes
-                    }
-                });
-                alert("Você atingiu uma mina! Todas as gemas desta rodada foram perdidas.");
-                currentGems = 0; // Perde as gemas
-                document.getElementById('gem-count').innerText = "0";
-            }
-        }
-
-        // --- FUNÇÕES DE SAQUE ---
-
-        // Gera o modal de saque com QR Code e Código de Segurança
-        function showWithdraw() {
-            gameActive = false; // Garante que o jogo esteja bloqueado
-            
-            // Impede que novos jogos sejam iniciados
-            document.getElementById('start-btn').disabled = true;
-            document.getElementById('mine-count').disabled = true;
-            document.getElementById('cashout-btn').style.display = 'none'; // Esconde o botão de saque
-            
-            // Gera um código de segurança único (MSK-9caracteresaleatórios)
-            const randomId = Math.random().toString(36).substr(2, 9).toUpperCase();
-            const secureCode = "MSK-" + randomId;
-            
-            // Preenche o modal
-            document.getElementById('final-gem-count').innerText = currentGems.toLocaleString();
-            document.getElementById('secure-code').innerText = secureCode;
-            
-            // Mostra o overlay e o modal
+            document.getElementById('final-value').innerText = profit.toLocaleString();
+            document.getElementById('ticket-code').innerText = "TK-" + Math.floor(Math.random()*999999);
             document.getElementById('overlay').style.display = 'block';
-            document.getElementById('withdraw-modal').style.display = 'block';
+            document.getElementById('modal-withdraw').style.display = 'block';
             
-            // Aplica opacidade no grid para destacar o modal
-            document.getElementById('grid').style.opacity = '0.3';
+            gameInProgress = false;
         }
 
-        // Fecha o modal e reseta o jogo para o estado inicial
-        function closeWithdrawAndReset() {
-            // Esconde modal e overlay
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('withdraw-modal').style.display = 'none';
-            
-            // Reseta a opacidade do grid
-            document.getElementById('grid').style.opacity = '1';
-            
-            // Reseta o jogo para o início
-            gameActive = false;
-            currentGems = 0;
-            document.getElementById('gem-count').innerText = "0";
-            document.getElementById('grid').innerHTML = ''; // Limpa a grade
-            document.getElementById('start-btn').disabled = false;
-            document.getElementById('mine-count').disabled = false;
-            document.getElementById('cashout-btn').style.display = 'none';
+        function gameOver(win) {
+            gameInProgress = false;
+            if(!win) {
+                alert("BOOM! Você perdeu tudo desta rodada.");
+                setTimeout(() => {
+                    if(balance < 1000000) {
+                        alert("Saldo insuficiente para continuar. Use uma nova Key!");
+                        location.reload();
+                    } else {
+                        document.getElementById('btn-start').disabled = false;
+                        document.getElementById('board').innerHTML = '';
+                    }
+                }, 1000);
+            }
+        }
+
+        function updateBalance() {
+            document.getElementById('user-balance').innerText = balance.toLocaleString();
         }
     </script>
 </body>
