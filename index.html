@@ -5,80 +5,194 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEATH STORE - MINES SYSTEM</title>
     <style>
-        :root { --red: #ff0000; --black: #000000; --dark: #0f0f0f; --gray: #1a1a1a; --gold: #ffcc00; --green: #28a745; }
-        body { background: var(--black); color: white; font-family: 'Impact', sans-serif; margin: 0; overflow-x: hidden; }
+        :root { 
+            --red: #ff0000; 
+            --black: #000000; 
+            --dark: #0f0f0f; 
+            --gray: #1a1a1a; 
+            --gold: #ffcc00; 
+            --green: #28a745; 
+        }
         
-        .header { width: 100%; background: var(--dark); padding: 15px; border-bottom: 3px solid var(--red); display: flex; justify-content: space-around; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .balance { color: var(--gold); font-size: 1.4rem; text-shadow: 0 0 10px rgba(255,204,0,0.5); }
+        body { 
+            background: var(--black); 
+            color: white; 
+            font-family: 'Impact', sans-serif; 
+            margin: 0; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .header { 
+            width: 100%; 
+            background: var(--dark); 
+            padding: 15px 0; 
+            border-bottom: 3px solid var(--red); 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+        }
+        
+        .balance { color: var(--gold); font-size: 1.3rem; text-shadow: 0 0 10px rgba(255,204,0,0.5); }
 
-        .container { display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        #game-screen { display: none; width: 100%; max-width: 400px; }
-        #login-screen { width: 100%; max-width: 350px; margin-top: 50px; text-align: center; }
+        .container { 
+            width: 90%; 
+            max-width: 400px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+        }
 
-        .card { background: var(--dark); border: 2px solid var(--red); padding: 20px; border-radius: 15px; box-shadow: 0 0 20px rgba(255,0,0,0.2); margin-bottom: 20px; }
-        input { width: 85%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--red); color: white; border-radius: 8px; text-align: center; font-size: 1.1rem; }
+        #game-screen { display: none; width: 100%; }
+        #login-screen { width: 100%; margin-top: 50px; text-align: center; }
 
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 20px 0; }
-        .tile { aspect-ratio: 1; background: var(--gray); border-radius: 8px; border: 1px solid #333; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: 0.2s; }
+        .card { 
+            background: var(--dark); 
+            border: 2px solid var(--red); 
+            padding: 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 0 20px rgba(255,0,0,0.2); 
+            margin-bottom: 15px; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            background: #000; 
+            border: 1px solid var(--red); 
+            color: white; 
+            border-radius: 8px; 
+            text-align: center; 
+            font-size: 1.1rem; 
+            box-sizing: border-box;
+        }
+
+        /* GRID AJUSTADA PARA FICAR COMPACTA E ALINHADA (250px) */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 6px; 
+            width: 100%;
+            max-width: 250px; /* Tamanho fixo para não bagunçar */
+            margin: 20px auto; 
+            box-sizing: border-box;
+        }
+
+        .tile { 
+            aspect-ratio: 1 / 1; 
+            background: var(--gray); 
+            border-radius: 6px; 
+            border: 1px solid #333; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.2rem; 
+            transition: 0.2s; 
+            box-sizing: border-box;
+        }
+
         .tile.revealed { background: #000; cursor: default; border-color: var(--red); }
         .tile.gem { color: #00ff00; text-shadow: 0 0 15px #00ff00; }
         .tile.bomb { color: var(--red); text-shadow: 0 0 15px var(--red); }
 
-        button { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 1.1rem; margin: 5px 0; transition: 0.3s; }
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            font-size: 1.1rem; 
+            margin: 5px 0; 
+        }
+
         .btn-red { background: var(--red); color: white; }
         .btn-green { background: var(--green); color: white; }
-        .btn-gold { background: var(--gold); color: black; margin-top: 20px; }
-        button:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
+        .btn-gold { background: var(--gold); color: black; margin-top: 10px; }
+        button:disabled { background: #444; cursor: not-allowed; opacity: 0.6; }
 
-        #modal-withdraw { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: black; padding: 25px; border-radius: 15px; text-align: center; z-index: 200; width: 80%; max-width: 320px; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 150; }
-        .info-text { font-size: 0.9rem; color: #bbb; margin-bottom: 5px; display: block; }
+        #modal-withdraw { 
+            display: none; 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: white; 
+            color: black; 
+            padding: 25px; 
+            border-radius: 15px; 
+            text-align: center; 
+            z-index: 200; 
+            width: 85%; 
+            max-width: 320px; 
+        }
+
+        #overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.9); 
+            z-index: 150; 
+        }
+
+        .label-text { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div><span style="color:var(--red)">DEATH</span> STORE</div>
-        <div class="balance">SALDO: <span id="user-balance">0</span></div>
+        <div style="font-size: 1.2rem;"><span style="color:var(--red)">DEATH</span> STORE</div>
+        <div class="balance">💰 <span id="user-balance">0</span></div>
     </div>
 
     <div class="container">
         <div id="login-screen">
             <div class="card">
-                <h2 style="color:var(--red)">RESGATAR KEY</h2>
-                <input type="text" id="key-input" placeholder="COLE SUA KEY AQUI">
-                <button class="btn-red" onclick="login()">ATIVAR SALDO</button>
+                <h2 style="color:var(--red); margin: 0 0 15px 0;">ATIVAR KEY</h2>
+                <input type="text" id="key-input" placeholder="DIGITE SUA KEY">
+                <button class="btn-red" onclick="login()">RESGATAR SALDO</button>
             </div>
         </div>
 
         <div id="game-screen">
             <div class="card">
-                <span class="info-text">MINAS (1 A 5):</span>
+                <div class="label-text">MINAS (1-5):</div>
                 <input type="number" id="mine-select" value="1" min="1" max="5">
                 
-                <span class="info-text">VALOR DA APOSTA:</span>
-                <input type="number" id="bet-amount" value="1000000" step="100000">
+                <div class="label-text">VALOR DA APOSTA:</div>
+                <input type="number" id="bet-amount" value="1000000">
                 
-                <button id="btn-start" class="btn-red" onclick="startGame()">INICIAR JOGO</button>
-                <button id="btn-cashout" class="btn-green" style="display:none" onclick="stopGame()">PARAR / RETIRAR</button>
+                <button id="btn-start" class="btn-red" onclick="startGame()">INICIAR RODADA</button>
+                <button id="btn-cashout" class="btn-green" style="display:none" onclick="stopGame()">COLETAR</button>
             </div>
 
             <div class="grid" id="board"></div>
 
-            <button class="btn-gold" onclick="openWithdraw()">SACAR PARA CARTEIRA</button>
+            <button class="btn-gold" onclick="openWithdraw()">SOLICITAR SAQUE</button>
         </div>
     </div>
 
     <div id="overlay"></div>
     <div id="modal-withdraw">
-        <h2 style="color: var(--green);">SOLICITAR SAQUE</h2>
-        <p>Saldo Atual: <br><b id="final-value">0</b> GEMAS</p>
-        <div id="qr-area">
-             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=SAQUE_DEATH" alt="QR">
-        </div>
+        <h2 style="color: var(--green);">SAQUE DISPONÍVEL</h2>
+        <p>Você tem: <br><b id="final-value" style="font-size: 1.5rem;">0</b> GEMAS</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=SAQUE_DEATH" alt="QR">
         <p>TICKET: <span id="ticket-code" style="font-weight:bold; color:var(--red)"></span></p>
-        <p style="font-size:0.7rem">Tire print e envie ao suporte para converter em dinheiro.</p>
-        <button class="btn-red" onclick="closeModal()">VOLTAR</button>
+        <p style="font-size:0.7rem">Envie o PRINT deste ticket para o suporte.</p>
+        <button class="btn-red" onclick="closeModal()">FECHAR</button>
     </div>
 
     <script>
@@ -87,25 +201,21 @@
         let currentMultiplier = 1.0;
         let minesLocations = [];
         let gameActive = false;
-        let hits = 0;
 
-        // Sistema de 20 Keys Únicas com Valores Equilibrados
+        // Banco de 20 Keys (4 de cada valor)
         const keyDatabase = {
-            "DS-1M-A1": 1000000, "DS-1M-B2": 1000000, "DS-1M-C3": 1000000, "DS-1M-D4": 1000000,
-            "DS-2M-A1": 2000000, "DS-2M-B2": 2000000, "DS-2M-C3": 2000000, "DS-2M-D4": 2000000,
-            "DS-3M-A1": 3000000, "DS-3M-B2": 3000000, "DS-3M-C3": 3000000, "DS-3M-D4": 3000000,
-            "DS-4M-A1": 4000000, "DS-4M-B2": 4000000, "DS-4M-C3": 4000000, "DS-4M-D4": 4000000,
-            "DS-5M-A1": 5000000, "DS-5M-B2": 5000000, "DS-5M-C3": 5000000, "DS-5M-D4": 5000000
+            "DS-1M-01": 1000000, "DS-1M-02": 1000000, "DS-1M-03": 1000000, "DS-1M-04": 1000000,
+            "DS-2M-01": 2000000, "DS-2M-02": 2000000, "DS-2M-03": 2000000, "DS-2M-04": 2000000,
+            "DS-3M-01": 3000000, "DS-3M-02": 3000000, "DS-3M-03": 3000000, "DS-3M-04": 3000000,
+            "DS-4M-01": 4000000, "DS-4M-02": 4000000, "DS-4M-03": 4000000, "DS-4M-04": 4000000,
+            "DS-5M-01": 5000000, "DS-5M-02": 5000000, "DS-5M-03": 5000000, "DS-5M-04": 5000000
         };
 
         function login() {
             const input = document.getElementById('key-input').value.trim();
             const usedKeys = JSON.parse(localStorage.getItem('death_used_keys') || "[]");
 
-            if (usedKeys.includes(input)) {
-                alert("Esta key já foi utilizada!");
-                return;
-            }
+            if (usedKeys.includes(input)) return alert("Key já utilizada!");
 
             if (keyDatabase[input]) {
                 balance = keyDatabase[input];
@@ -115,7 +225,7 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('game-screen').style.display = 'block';
             } else {
-                alert("Key inválida ou inexistente!");
+                alert("Key Inválida!");
             }
         }
 
@@ -126,23 +236,20 @@
             const numMines = parseInt(mineInput.value);
 
             if (currentBet > balance) return alert("Saldo insuficiente!");
-            if (numMines < 1 || numMines > 5) return alert("Selecione de 1 a 5 minas!");
+            if (numMines < 1 || numMines > 5) return alert("Escolha de 1 a 5 minas!");
             if (currentBet <= 0) return alert("Aposta inválida!");
 
-            // Setup Inicial
             balance -= currentBet;
             gameActive = true;
-            hits = 0;
             
-            // Multiplicador inicial conforme sua regra
-            // 1 mina -> 1.1 | 2 minas -> 1.2 | etc.
+            // Multiplicador inicial: 1 mina = 1.1 | 5 minas = 1.5
             currentMultiplier = 1 + (numMines * 0.1);
             
             updateUI();
             
             document.getElementById('btn-start').style.display = 'none';
             document.getElementById('btn-cashout').style.display = 'block';
-            document.getElementById('btn-cashout').innerText = `RETIRAR: ${(currentBet * currentMultiplier).toLocaleString()}`;
+            document.getElementById('btn-cashout').innerText = `PARAR: ${(currentBet * currentMultiplier).toLocaleString()}`;
             
             generateBoard(numMines);
         }
@@ -171,18 +278,21 @@
             tile.classList.add('revealed');
 
             if (minesLocations.includes(index)) {
-                // PERDEU
                 tile.innerHTML = '💣';
                 tile.classList.add('bomb');
-                gameOver(false);
+                gameActive = false;
+                setTimeout(() => {
+                    alert("BOOM! Você perdeu a aposta.");
+                    if (balance <= 0) {
+                        alert("Saldo Zerado. Key Expirada!");
+                        location.reload();
+                    }
+                    gameOver(false);
+                }, 200);
             } else {
-                // ACERTOU
                 tile.innerHTML = '💎';
                 tile.classList.add('gem');
-                hits++;
-                
-                // Cada clique aumenta o multiplicador (ex: +0.1 por acerto)
-                currentMultiplier += 0.1;
+                currentMultiplier += 0.12; // Aumenta o lucro a cada diamante
                 document.getElementById('btn-cashout').innerText = `RETIRAR: ${Math.floor(currentBet * currentMultiplier).toLocaleString()}`;
             }
         }
@@ -192,18 +302,13 @@
             const prize = Math.floor(currentBet * currentMultiplier);
             balance += prize;
             gameOver(true);
-            alert(`Você retirou ${prize.toLocaleString()} gemas!`);
+            alert(`Sucesso! +${prize.toLocaleString()} Gemas.`);
         }
 
         function gameOver(win) {
             gameActive = false;
             document.getElementById('btn-start').style.display = 'block';
             document.getElementById('btn-cashout').style.display = 'none';
-            
-            if (!win && balance <= 0) {
-                alert("SALDO ZERADO! Sua Key expirou.");
-                location.reload();
-            }
             updateUI();
         }
 
@@ -213,7 +318,7 @@
 
         function openWithdraw() {
             document.getElementById('final-value').innerText = balance.toLocaleString();
-            document.getElementById('ticket-code').innerText = "DS-" + Math.floor(Math.random()*999999);
+            document.getElementById('ticket-code').innerText = "DS-" + Math.floor(Math.random()*99999);
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('modal-withdraw').style.display = 'block';
         }
